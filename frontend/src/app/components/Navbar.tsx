@@ -16,7 +16,7 @@ const Navbar = (props: Props) => {
       </div>
 
       {/* Search Box */}
-      <div className="w-full md:w-[50rem]">
+      <div className="w-full md:w-[57rem]">
         <input
           type="search"
           className="h-[3rem] w-full rounded border border-neutral-300 bg-transparent px-3 py-[0.25rem] text-base text-neutral-700 outline-none transition duration-200 ease-in-out focus:border-blue-500 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-400"

@@ -49,7 +49,7 @@ const Slider: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full  max-w-6xl mx-auto overflow-hidden rounded-lg shadow-lg bg-white border-2 border-gray-200">
+    <div className="relative w-full  max-w-7xl mx-auto overflow-hidden rounded-lg shadow-lg bg-white border-2 border-gray-200">
       {/* Slides */}
       <div
         className="flex transition-transform duration-500"
@@ -61,11 +61,11 @@ const Slider: React.FC = () => {
             className="min-w-full flex flex-col md:flex-row items-center justify-between "
           >
             {/* Text Content */}
-            <div className="md:w-1/2 p-6 space-y-4">
-              <span className="text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-1 rounded">
+            <div className="md:w-1/2 p-6 px-20 space-y-6">
+              <span className="text-xs font-semibold text-blue-500 bg-gray-100 px-2 py-1  rounded">
                 {slide.subtitle}
               </span>
-              <h2 className="text-3xl font-bold text-gray-900">
+              <h2 className="text-4xl pt-4 font-bold text-gray-900">
                 {slide.title}
               </h2>
               <p className="text-gray-600">{slide.description}</p>
