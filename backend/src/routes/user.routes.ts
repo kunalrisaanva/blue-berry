@@ -5,8 +5,8 @@ const router = Router();
 
 
 // unprotected routes
-router.route("register").post(registerUser);
-router.route("login").post(loginUser);
+router.route("/register").post(registerUser);
+router.route("/login").post(loginUser);
 
 
 

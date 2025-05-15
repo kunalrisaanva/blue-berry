@@ -1,11 +1,16 @@
 import { Pool } from "pg";
+import dotenv from "dotenv";
+dotenv.config({ path: ".env" });
+
+const connectionString = process.env.POSTGRESQL_URI;
+console.log("test",connectionString);
+
 
 const pool = new Pool({
-  host: process.env.PGHOST,
-  user: process.env.PGUSER,
-  password: process.env.PGPASSWORD,
-  database: process.env.PGDATABASE,
-  port: parseInt(process.env.PGPORT || "5432", 10),
+  connectionString,
+    ssl: {
+        rejectUnauthorized: false,
+    },
 });
 
 

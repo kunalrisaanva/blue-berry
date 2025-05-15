@@ -4,10 +4,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 404 error
-app.use((req, res, next) => {
-  res.status(404).send("Error 404 <a href='/'>Go to Home Page</a>");
-});
+
 
 // health check route
 app.get("/", (req: Request, res: Response) => {
