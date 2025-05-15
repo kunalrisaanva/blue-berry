@@ -1,18 +1,27 @@
+// "use client";
 import React from "react";
 import { PiShoppingCartSimpleDuotone, PiUserDuotone } from "react-icons/pi";
+// import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type Props = {};
 
 const Navbar = (props: Props) => {
+
+  // const router = useRouter()
+
   return (
-    <nav className="flex flex-col md:flex-row items-center justify-center gap-4 p-4 shadow-md w-full">
+    <nav className="flex flex-col md:flex-row items-center justify-center gap-4 p-4 shadow-md w-full ">
       {/* Logo */}
       <div className="flex md:justify-center justify-start w-full md:w-auto">
+        <Link href="/">
         <img
           src="https://berry.reactbd.com/_next/static/media/logo.8fe5d04c.png"
           alt="Logo"
           className="h-10"
         />
+        </Link>
+        
       </div>
 
       {/* Search Box */}
@@ -26,13 +35,15 @@ const Navbar = (props: Props) => {
 
       {/* Cart & Login */}
       <div className="flex gap-3 w-full md:w-auto  md:justify-center">
-        <button className="bg-white h-[3rem] w-24 flex items-center justify-center gap-2 text-black rounded shadow-md hover:bg-gray-100">
+        <button className="bg-white h-[3rem] w-24 flex items-center justify-center gap-2 text-black rounded shadow-md hover:bg-gray-100 cursor-pointer">
           <PiShoppingCartSimpleDuotone size={20} color="blue" />
           <span className="hidden sm:inline">Cart</span>
         </button>
-        <button className="bg-white h-[3rem] w-24 flex items-center justify-center gap-2 text-black rounded shadow-md hover:bg-gray-100">
+        <button className="bg-white h-[3rem] w-24 flex items-center justify-center gap-2 text-black rounded shadow-md hover:bg-gray-100 cursor-pointer">
           <PiUserDuotone size={20} color="blue" />
+          <Link href={"/login"} className="hidden sm:inline">
           <span className="hidden sm:inline">Login</span>
+          </Link>
         </button>
       </div>
     </nav>
