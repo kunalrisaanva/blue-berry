@@ -1,6 +1,6 @@
 import express, { Request, Response, Errback, NextFunction } from "express";
 import passport from "./middleware/passport.middleware";
-
+import cors from "cors"
 
 const app = express();
 app.use(express.json());
@@ -10,6 +10,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 
 
+// cors middleware
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+}));
+
+
 // health check route
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
@@ -17,8 +25,10 @@ app.get("/", (req: Request, res: Response) => {
 
 // Import routes
 import { userRoutes } from "./routes/user.routes";
+import { productRoutes } from "./routes/product.routes";
 
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/products", productRoutes);
 
 // General error handling middleware , should be last
 app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
