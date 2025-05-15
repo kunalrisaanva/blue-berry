@@ -1,9 +1,13 @@
 import express, { Request, Response, Errback, NextFunction } from "express";
+import passport from "./middleware/passport.middleware";
+
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// passport middleware
+app.use(passport.initialize());
 
 
 // health check route
