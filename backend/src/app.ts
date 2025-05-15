@@ -17,12 +17,16 @@ import { userRoutes } from "./routes/user.routes";
 app.use("/api/v1/users", userRoutes);
 
 // General error handling middleware , should be last
-app.use((err: Errback, req: Request, res: Response, next: NextFunction) => {
-  console.error(err);
-  res.status(500).send({
-    status: "error",
-    message: "Something went wrong!",
-  });
+app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
+    const statusCode = err.statusCode || 500;
+    res.status(statusCode).json({
+      success: false,
+      message: err.message || "Internal Server Error",
+      errors: err.errors || [],
+      data: null,
+      stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
+    });
 });
+  
 
 export default app;

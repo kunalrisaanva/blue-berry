@@ -6,70 +6,71 @@ import { asyncHandler } from "../utils/AsyncHandler";
 import { db } from "../dbConnection/db";
 import bcrypt from "bcrypt";
 
-
-
 async function hashPassword(password: string): Promise<string> {
-    const salt = bcrypt.genSaltSync(10);
-    return bcrypt.hashSync(password, salt);
+  const salt = bcrypt.genSaltSync(10);
+  return bcrypt.hashSync(password, salt);
 }
-
 
 function comparePassword(password: string, hashedPassword: string): boolean {
-    return bcrypt.compareSync(password, hashedPassword);
+  return bcrypt.compareSync(password, hashedPassword);
 }
 
-
-
-const registerUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    // Validate Signup details
+const registerUser = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { email, password, username } = req.body;
-    console.log("object ---->", req.body);
 
-    if ([email, password, username].some(field => field === undefined || field === null || field === "")) {
-        return next(new ApiError(400, "All fields are required"));
+    if (
+      [email, password, username].some(
+        (field) => field === undefined || field === null || field === ""
+      )
+    ) {
+      return next(new ApiError(400, "All fields are required"));
     }
     if (password.length < 6) {
-        return next(new ApiError(400, "Password must be at least 6 characters long"));
+      return next(
+        new ApiError(400, "Password must be at least 6 characters long")
+      );
     }
     if (username.length < 3) {
-        return next(new ApiError(400, "Username must be at least 3 characters long"));
+      return next(
+        new ApiError(400, "Username must be at least 3 characters long")
+      );
     }
-
 
     const hashedPassword = await hashPassword(password);
 
-    console.log("hashedPassword ---->", hashedPassword);
-  
-    const existingUser = await db.query(`SELECT * FROM users WHERE email = $1 OR username = $2`, [email, username]);
-
-    console.log("existingUser ---->", existingUser);
+    const existingUser = await db.query(
+      `SELECT * FROM users WHERE email = $1 OR username = $2`,
+      [email, username]
+    );
 
     // Check if user already exists
-    if (existingUser) {
-        return next(new ApiError(400, "User with this email or username already exists"));
+    if (existingUser.rowCount !== null && existingUser.rowCount > 0) {
+      throw next(new ApiError(400, "User already exists"));
     }
     // Create new user
-    const newUser = await db.query(`INSERT INTO users (email, password, username) VALUES ($1, $2, $3) RETURNING *`, [email, hashedPassword, username]);
-    console.log("newUser ---->", newUser);
+    const newUser = await db.query(
+      `INSERT INTO users (email, password, username) VALUES ($1, $2, $3) RETURNING *`,
+      [email, hashedPassword, username]
+    );
+
     if (newUser && newUser.rowCount !== null && newUser.rowCount > 0) {
-        const user = newUser.rows[0];
-        const response = new ApiResponse(201, user, "User created successfully");
-        return res.status(201).json(response);
+      const user = newUser.rows[0];
+      const response = new ApiResponse(201, user, "User created successfully");
+      return res.status(201).json(response);
     } else {
-        return next(new ApiError(500, "User creation failed"));
+      return next(new ApiError(500, "User creation failed"));
     }
+  }
+);
 
- 
-});
-
-const loginUser = asyncHandler( async (req: Request, res: Response, next: NextFunction) => {
+const loginUser = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
     // Validate Login details
     // postgress: validate email, password, username
-});
+  }
+);
 
-
-
-  
 // const getUser = (req: Request, res: Response, next: NextFunction) => {
 //   // Validate get user details
 //   // postgress: validate email, password, username
@@ -91,4 +92,4 @@ const loginUser = asyncHandler( async (req: Request, res: Response, next: NextFu
 //   // postgress: validate email, password, username
 // };
 
-export { registerUser , loginUser};
+export { registerUser, loginUser };
