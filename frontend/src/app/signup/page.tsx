@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-const Login = () => {
+const Signup = () => {
   return (
     <div className="min-h-screen flex  justify-center ">
       <div className="bg-white p-6 rounded-2xl shadow-lg  w-[28rem] my-[5rem]">
@@ -70,7 +70,10 @@ const Login = () => {
 
             <span className="text-xs mt-2">Enter address</span>
             <input type="email"  placeholder="Enter your email address" className="mt-2 p-1 border border-gray-300 rounded-md "/>
-          <button className="text-xs bg-black text-white p-3 rounded-md mt-7 cursor-pointer">
+
+            <span className="text-xs mt-2">Password</span>
+            <input type="email"  placeholder="Enter your Password" className="mt-2 p-1 border border-gray-300 rounded-md "/>
+          <button className="text-xs bg-black text-white p-3 rounded-md mt-4 cursor-pointer">
               Continue
             </button>
 
@@ -78,9 +81,11 @@ const Login = () => {
 
         <div className="flex-grow h-px bg-gray-200 mt-7"></div>
 
-        <p className="text-sm text-gray-500 text-center mt-2">Already Have an account? <Link href={"/signup"}>
-        <span className="text-black">Sign in</span>
+        <p className="text-sm text-gray-500 text-center mt-2">Don’t have an account?
+         <Link href={"/login"}>
+        <span className="text-black">Sign up</span>
         </Link></p>
+        
         </div>
 
         
@@ -98,4 +103,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;
