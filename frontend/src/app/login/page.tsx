@@ -1,8 +1,13 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
 const Login = () => {
+
+
+    const [ email ,setEmail] = useState("");
+  
   return (
     <div className="min-h-screen flex  justify-center ">
       <div className="bg-white p-6 rounded-2xl shadow-lg  w-[28rem] my-[5rem]">
@@ -69,7 +74,7 @@ const Login = () => {
         <form action="" className="flex flex-col">
 
             <span className="text-xs mt-2">Enter address</span>
-            <input type="email"  placeholder="Enter your email address" className="mt-2 p-1 border border-gray-300 rounded-md "/>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}  placeholder="Enter your email address" className="mt-2 p-1 border border-gray-300 rounded-md "/>
           <button className="text-xs bg-black text-white p-3 rounded-md mt-7 cursor-pointer">
               Continue
             </button>
@@ -84,15 +89,6 @@ const Login = () => {
         </div>
 
         
-
-        {/* <!-- Login Form --> */}
-        {/* <form className="space-y-4">
-        <input type="email" placeholder="Email" className="w-full p-2 border rounded-md" />
-        <input type="password" placeholder="Password" className="w-full p-2 border rounded-md" />
-        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">
-          Login
-        </button>
-      </form> */}
       </div>
     </div>
   );
