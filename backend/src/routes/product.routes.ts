@@ -9,7 +9,7 @@ const router = Router();
 // protected routes
 router.route("/all-prodcuts").get(allProducts);
 
-
+router.route("/add-product").post(passport.authenticate("jwt", { session: false }), allProducts);
 
 
 
