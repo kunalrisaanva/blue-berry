@@ -1,6 +1,8 @@
 import express, { Request, Response, Errback, NextFunction } from "express";
 import passport from "./middleware/passport.middleware";
 import cors from "cors"
+import morgan from "morgan";
+
 
 const app = express();
 app.use(express.json());
@@ -16,6 +18,8 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
+
+app.use(morgan("dev"));
 
 
 // health check route
