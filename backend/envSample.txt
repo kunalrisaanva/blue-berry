@@ -1,0 +1,26 @@
+
+# 'production' 
+NODE_ENV = "develoment"
+
+
+# Express Config
+PORT = "3000"
+CORS_ORIGIN = "http://localhost:3000"
+JWT_SECRET = "jwt secret here, 348392"
+
+
+# Database Postgress 
+POSTGRESQL_URI = "postgress uri"
+
+
+# Email , Resend.com
+RESEND_API_KEY = "resend api key"
+
+# dont add / slash at end of url, requires to add token parameter in url
+RESET_PASSWORD_PAGE_URL =  "http://localhost:3001/reset-password"
+
+
+
+
+
+
