@@ -4,7 +4,7 @@ type Props = {};
 
 function Footer({}: Props) {
   return (
-    <footer className="bg-gray-50 py-4 px-6">
+    <footer className="bg-gray-50 py-4 px-6 pt-6">
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center">
         {/* Left Text */}
         <p className="text-sm text-gray-600 text-center sm:text-left">

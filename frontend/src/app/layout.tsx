@@ -31,9 +31,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {!hideNavbar && <Navbar />}
-        <div className="w-full flex justify-center">
-          <div className="w-full max-w-[1200px] px-4">{children}</div>
-        </div>
+        {/* <div className="px-22"> */}
+          {/* <div className="w-full max-w-[1200px] px-4"> */}
+            {children}
+            {/* </div> */}
+        {/* </div> */}
         {!hideNavbar && <Footer />}
       </body>
     </html>

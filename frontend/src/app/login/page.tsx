@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import Button from "../components/ui/Button";
 
 const Login = () => {
 
@@ -53,11 +54,8 @@ const Login = () => {
 
         <div className="bg-white shadow-2xl mt-[5rem] rounded p-3 h-[20rem] inset-shadow-2xs">
           <div className="flex items-center justify-center gap-2 mt-[2rem] border hover:bg-gray-50 border-gray-200 rounded-md p-2">
-            <img
-              src="https://img.clerk.com/static/google.svg?width=160"
-              alt="google image"
-              className="h-10px"
-            />
+            <Image src={"https://img.clerk.com/static/google.svg?width=160"} height={12} width={12} alt="google image"/>
+           
             <button className="text-xs text-gray-600">
               Continue With Google
             </button>
@@ -75,10 +73,7 @@ const Login = () => {
 
             <span className="text-xs mt-2">Enter address</span>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}  placeholder="Enter your email address" className="mt-2 p-1 border border-gray-300 rounded-md "/>
-          <button className="text-xs bg-black text-white p-3 rounded-md mt-7 cursor-pointer">
-              Continue
-            </button>
-
+            <Button className="text-xs bg-black text-white p-3 rounded-md mt-7 cursor-pointer">Continue</Button>
         </form>
 
         <div className="flex-grow h-px bg-gray-200 mt-7"></div>

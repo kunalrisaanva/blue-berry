@@ -104,12 +104,12 @@ function Main({}: Props) {
     },
   ];
   return (
-    <div>
-      <div className="py-10 p-2">
+    <div className="px-22">
+      {/* <div className="py-10 p-2"> */}
         <Slider />
-      </div>
+      {/* </div> */}
 
-      <div className=" lg:justify-center align-middle p-4 ">
+      <div className="my-6">
         <h1 className="text-2xl font-semibold text-gray-600">
           Day of the <span className="text-[#7688db]"> Deal</span>
         </h1>
