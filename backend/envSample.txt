@@ -1,10 +1,10 @@
 
 # 'production' 
-NODE_ENV = "develoment"
+NODE_ENV = "development"
 
 
 # Express Config
-PORT = "3000"
+PORT = "3001"
 CORS_ORIGIN = "http://localhost:3000"
 JWT_SECRET = "jwt secret here, 348392"
 
@@ -17,7 +17,7 @@ POSTGRESQL_URI = "postgress uri"
 RESEND_API_KEY = "resend api key"
 
 # dont add / slash at end of url, requires to add token parameter in url
-RESET_PASSWORD_PAGE_URL =  "http://localhost:3001/reset-password"
+RESET_PASSWORD_PAGE_URL =  "http://localhost:3000/reset-password"
 
 
 
