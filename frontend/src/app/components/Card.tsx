@@ -1,7 +1,11 @@
+"use client";
+
 import React from "react";
 import { Star } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
 
 interface ProductCardProps {
+  id: number;
   image: string;
   isNew?: string;
   category: string;
@@ -13,6 +17,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
+  id,
   image,
   isNew,
   category,
@@ -22,6 +27,39 @@ const ProductCard: React.FC<ProductCardProps> = ({
   originalPrice,
   quantity,
 }) => {
+  // set up redux dispatch and selected cart items
+  const dispatch = useDispatch();
+  const cartItems = useSelector((state: any) => state.cart.items);
+  const isIncart = cartItems.some((item: { id: number }) => item.id === id);
+  // handle add to cart
+  const handleAddToCart = () => {
+    const newItem = {
+      id,
+      image,
+      isNew,
+      category,
+      rating,
+      title,
+      price,
+      originalPrice,
+      quantity: parseInt(quantity),
+    };
+    if (isIncart) {
+      // if item is already in cart, update quantity
+      const existingItem = cartItems.find(
+        (item: { id: number }) => item.id === id
+      );
+      const updatedItem = {
+        ...existingItem,
+        quantity: existingItem.quantity + parseInt(quantity),
+      };
+      dispatch({ type: "cart/updateItemQuantity", payload: updatedItem });
+    } else {
+      // if item is not in cart, add to cart
+      dispatch({ type: "cart/addToCart", payload: newItem });
+    }
+  };
+
   return (
     <div className="border rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden w-full mx-auto">
       <div className="relative p-4 flex  justify-center group">
@@ -69,7 +107,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <span className="text-gray-500">{quantity}</span>
         </div>
 
-        <button className="w-full mt-2 bg-indigo-50 hover:bg-indigo-100 text-black border border-indigo-200 rounded-xl py-2 font-medium">
+        <button
+          className="w-full mt-2 bg-indigo-50 hover:bg-indigo-100 text-black border border-indigo-200 rounded-xl py-2 font-medium"
+          onClick={handleAddToCart}
+        >
           Add to cart
         </button>
       </div>

@@ -1,11 +1,12 @@
 import Slider from "@/app/components/Slider";
 import Card from "@/app/components/Card";
 import React from "react";
+import Link from "next/link";
 
 type Props = {};
 
 function Main({}: Props) {
-  const mock = [
+  const data = [
     {
       id: 1,
       image:
@@ -42,72 +43,11 @@ function Main({}: Props) {
       originalPrice: 10,
       quantity: "1",
     },
-    {
-      id: 4,
-      image:
-        "https://cdn.sanity.io/images/szo9br23/production/d9f04ef79971536d48b7d3883152a3ec33b4821c-800x800.jpg?w=500&h=500",
-      isNew: "HOT",
-      category: "Snacks",
-      rating: 4,
-      title: "Crunchy Banana Chips",
-      price: 5,
-      originalPrice: 10,
-      quantity: "1",
-    },
-    {
-      id: 5,
-      image:
-        "https://cdn.sanity.io/images/szo9br23/production/d9f04ef79971536d48b7d3883152a3ec33b4821c-800x800.jpg?w=500&h=500",
-      isNew: "HOT",
-      category: "Snacks",
-      rating: 4,
-      title: "Crunchy Banana Chips",
-      price: 5,
-      originalPrice: 10,
-      quantity: "1",
-    },
-    {
-      id: 6,
-      image:
-        "https://cdn.sanity.io/images/szo9br23/production/d9f04ef79971536d48b7d3883152a3ec33b4821c-800x800.jpg?w=500&h=500",
-      isNew: "HOT",
-      category: "Snacks",
-      rating: 4,
-      title: "Crunchy Banana Chips",
-      price: 5,
-      originalPrice: 10,
-      quantity: "1",
-    },
-    {
-      id: 7,
-      image:
-        "https://cdn.sanity.io/images/szo9br23/production/d9f04ef79971536d48b7d3883152a3ec33b4821c-800x800.jpg?w=500&h=500",
-      isNew: "HOT",
-      category: "Snacks",
-      rating: 4,
-      title: "Crunchy Banana Chips",
-      price: 5,
-      originalPrice: 10,
-      quantity: "1",
-    },
-    {
-      id: 8,
-      image:
-        "https://cdn.sanity.io/images/szo9br23/production/d9f04ef79971536d48b7d3883152a3ec33b4821c-800x800.jpg?w=500&h=500",
-      isNew: "HOT",
-      category: "Snacks",
-      rating: 4,
-      title: "Crunchy Banana Chips",
-      price: 5,
-      originalPrice: 10,
-      quantity: "1",
-    },
   ];
+
   return (
     <div className="px-22">
-      {/* <div className="py-10 p-2"> */}
-        <Slider />
-      {/* </div> */}
+      <Slider />
 
       <div className="my-6">
         <h1 className="text-2xl font-semibold text-gray-600">
@@ -118,18 +58,20 @@ function Main({}: Props) {
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {mock.map((item) => (
-          <Card
-            key={item.id}
-            image={item.image}
-            isNew={item.isNew}
-            category={item.category}
-            rating={item.rating}
-            title={item.title}
-            price={item.price}
-            originalPrice={item.originalPrice}
-            quantity={item.quantity}
-          />
+        {data.map((item) => (
+          <Link href={`/product/${item.id}`} key={item.id}>
+            <Card
+              id={item.id}
+              image={item.image}
+              isNew={item.isNew}
+              category={item.category}
+              rating={item.rating}
+              title={item.title}
+              price={item.price}
+              originalPrice={item.originalPrice}
+              quantity={item.quantity}
+            />
+          </Link>
         ))}
       </div>
     </div>

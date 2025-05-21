@@ -1,19 +1,19 @@
-'use client';
-
-import { usePathname } from 'next/navigation';
-import { Geist, Geist_Mono } from 'next/font/google';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import './globals.css';
+"use client";
+import ReduxProvider from "@/app/components/ReduxProvider";
+import { usePathname } from "next/navigation";
+import { Geist, Geist_Mono } from "next/font/google";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import "./globals.css";
 
 const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 export default function RootLayout({
@@ -22,21 +22,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const hideNavbar = pathname === '/login' || pathname === '/signup';
-  
+  const hideNavbar = pathname === "/login" || pathname === "/signup";
 
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {!hideNavbar && <Navbar />}
-        {/* <div className="px-22"> */}
+        <ReduxProvider>
+          {!hideNavbar && <Navbar />}
+          {/* <div className="px-22"> */}
           {/* <div className="w-full max-w-[1200px] px-4"> */}
-            {children}
-            {/* </div> */}
-        {/* </div> */}
-        {!hideNavbar && <Footer />}
+          {children}
+          {/* </div> */}
+          {/* </div> */}
+          {!hideNavbar && <Footer />}
+        </ReduxProvider>
       </body>
     </html>
   );
