@@ -38,18 +38,19 @@ const addProduct = asyncHandler(async (req:MulterRequest,res:Response,next:NextF
   }
 
 //   Handle image upload
-  let product_image_url: string = "";
+  let imageurl: string = "";
 
   if (req.file && req.file.path) {
     const userImagePath = req.file.path;
-    product_image_url = await cloudinaryUploader(userImagePath);
+    console.log("userImagePath",userImagePath);
+    imageurl = await cloudinaryUploader(userImagePath);
   }
 
   const newProduct = await db.query(
-    `INSERT INTO products (name, description, price, image_url, qty, category, inStock, rating, isNew) 
+    `INSERT INTO products (name, description, price, imageurl, qty, category, inStock, rating, isNew) 
      VALUES ($1, $2, $3, $4, $5, $6, $7,$8,$9) 
      RETURNING *`,
-    [name, description, price, product_image_url, qty, category, inStock, rating, isNew]
+    [name, description, price, imageurl, qty, category, inStock, rating, isNew]
   );
 
   const response = new ApiResponse(201, newProduct.rows[0], "Product created successfully");
