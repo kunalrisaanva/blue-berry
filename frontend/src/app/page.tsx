@@ -1,11 +1,14 @@
+"use client";
 import Slider from "@/app/components/Slider";
 import Card from "@/app/components/Card";
-import React from "react";
-import Link from "next/link";
+import React, { useEffect, useState } from "react";
+import Loader from "@/app/components/Loder";
 
 type Props = {};
 
 function Main({}: Props) {
+  const [cartData, setCartData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false); // State to track loading status
   const data = [
     {
       id: 1,
@@ -43,13 +46,48 @@ function Main({}: Props) {
       originalPrice: 10,
       quantity: "1",
     },
+    {
+      id: 4,
+      image:
+        "https://cdn.sanity.io/images/szo9br23/production/d9f04ef79971536d48b7d3883152a3ec33b4821c-800x800.jpg?w=500&h=500",
+      isNew: "HOT",
+      category: "Snacks",
+      rating: 4,
+      title: "Crunchy Banana Chips",
+      price: 5,
+      originalPrice: 10,
+      quantity: "1",
+    },
   ];
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       setLoading(true); // Set loading to true before fetching data
+  //       const response = await fetch(
+  //         "https://blue-berry.onrender.com/api/v1/products/all-prodcuts"
+  //       );
+  //       const data = await response.json();
+  //       setCartData(data);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     } finally {
+  //       setLoading(false); // Set loading to false after fetching data
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
+
+  if (loading) {
+    // Show loader while data is being fetched
+    return <Loader />;
+  }
+
   return (
-    <div className="px-22">
+    <div className="w-full ">
       <Slider />
 
-      <div className="my-6">
+      <div className="my-6 ">
         <h1 className="text-2xl font-semibold text-gray-600">
           Day of the <span className="text-[#7688db]"> Deal</span>
         </h1>
@@ -59,19 +97,18 @@ function Main({}: Props) {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {data.map((item) => (
-          <Link href={`/product/${item.id}`} key={item.id}>
-            <Card
-              id={item.id}
-              image={item.image}
-              isNew={item.isNew}
-              category={item.category}
-              rating={item.rating}
-              title={item.title}
-              price={item.price}
-              originalPrice={item.originalPrice}
-              quantity={item.quantity}
-            />
-          </Link>
+          <Card
+            key={item.id}
+            id={item.id}
+            image={item.image}
+            isNew={item.isNew}
+            category={item.category}
+            rating={item.rating}
+            title={item.title}
+            price={item.price}
+            originalPrice={item.originalPrice}
+            quantity={item.quantity}
+          />
         ))}
       </div>
     </div>

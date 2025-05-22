@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { Star } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -70,11 +71,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
             ))}
           </span>
         )}
-        <img
-          src={image}
-          alt={title}
-          className="w-full object-contain transition-transform duration-300 ease-in-out group-hover:scale-110"
-        />
+        <Link href={`/product/${id}`}>
+          <img
+            src={image}
+            alt={title}
+            className="w-full object-contain transition-transform duration-300 ease-in-out group-hover:scale-110"
+          />
+        </Link>
       </div>
 
       <div className="border-t p-4 space-y-1">
