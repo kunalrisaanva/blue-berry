@@ -28,7 +28,7 @@ const allProducts = asyncHandler(async (req:Request,res:Response,next:NextFuncti
 
 const addProduct = asyncHandler(async (req:MulterRequest,res:Response,next:NextFunction) => {
 
-    const { name, description, price, qty, category, inStock, rating , isNew } = req.body;
+    const { name, description, price, previousPrice, qty, category, inStock, rating , isNew } = req.body;
     // console.log("req.body",req.body);
 
  const existingProduct = await db.query("SELECT * FROM products WHERE name = $1", [name]);
@@ -47,10 +47,10 @@ const addProduct = asyncHandler(async (req:MulterRequest,res:Response,next:NextF
   }
 
   const newProduct = await db.query(
-    `INSERT INTO products (name, description, price, imageurl, qty, category, inStock, rating, isNew) 
-     VALUES ($1, $2, $3, $4, $5, $6, $7,$8,$9) 
+    `INSERT INTO products (name, description, price,previousPrice, imageurl, qty, category, inStock, rating, isNew) 
+     VALUES ($1, $2, $3, $4, $5, $6, $7,$8,$9,$10) 
      RETURNING *`,
-    [name, description, price, imageurl, qty, category, inStock, rating, isNew]
+    [name, description, price,previousPrice, imageurl, qty, category, inStock, rating, isNew]
   );
 
   const response = new ApiResponse(201, newProduct.rows[0], "Product created successfully");
