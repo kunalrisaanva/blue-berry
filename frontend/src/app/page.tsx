@@ -3,12 +3,38 @@ import Slider from "@/app/components/Slider";
 import Card from "@/app/components/Card";
 import React, { useEffect, useState } from "react";
 import Loader from "@/app/components/Loder";
+import axios from "axios";
 
 type Props = {};
 
 function Main({}: Props) {
   const [cartData, setCartData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false); // State to track loading status
+  const [error, setError] = useState<string | null>(null); // State to track errors
+  const [cardsData, setcardsData] = useState<any[]>([]);
+
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true); // Set loading to true before fetching data
+        // const NEXT_BASE_API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_API_UR}/api/v1/products/all-prodcuts`
+        );
+        console.log("response", response.data);
+        setCartData(response.data);
+      } catch (error) {
+        setError(error instanceof Error ? error.message : String(error));
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false); // Set loading to false after fetching data
+      }
+    };
+    fetchData();
+  }, []);
+
   const data = [
     {
       id: 1,
@@ -60,23 +86,6 @@ function Main({}: Props) {
     },
   ];
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       setLoading(true); // Set loading to true before fetching data
-  //       const response = await fetch(
-  //         "https://blue-berry.onrender.com/api/v1/products/all-prodcuts"
-  //       );
-  //       const data = await response.json();
-  //       setCartData(data);
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     } finally {
-  //       setLoading(false); // Set loading to false after fetching data
-  //     }
-  //   };
-  //   fetchData();
-  // }, []);
 
   if (loading) {
     // Show loader while data is being fetched
