@@ -5,12 +5,10 @@ import Link from "next/link";
 import axios from "axios";
 import Loader from "../components/Loder";
 import { toast } from "sonner";
-import Router, { useRouter } from "next/router";
+import Router, { useRouter } from "next/navigation";
 
 const Signup = () => {
-
-
-  // const router = useRouter();
+  const router = useRouter();
 
   const [formData, setFormData] = React.useState({
     email: "",
@@ -33,36 +31,35 @@ const Signup = () => {
       return;
     }
 
-    console.log(formData);
-
-    // shet loader true
-
-    // setLoading(true);
-
-    // Here you can handle the form submission, e.g., send data to an API
+    setLoading(true);
 
     axios
       .post(
-        `https://blue-berry.onrender.com/api/v1/users/register`,
+        `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/register`,
         formData
       )
       .then((response) => {
         console.log("Signup successful:", response.data);
         // Handle successful signup, e.g., redirect to login or dashboard
 
-        // router.push("/")
-        toast.success(
-          "Signup successful! Please check your email for verification."
-        );
+        router.push("/login");
+
+        toast.success("Signup successful!");
       })
       .catch((error) => {
         console.error("Error during signup:", error);
+        toast.error(
+          error.response?.data?.message || "An error occurred during signup."
+        );
+      })
+      .finally(() => {
+        setLoading(false); // Set loading to false after the request is complete
       });
 
-    setFormData({
-      email: "",
-      password: "",
-    });
+    // setFormData({
+    //   email: "",
+    //   password: "",
+    // });
   };
 
   // todo  password toggler working but add icon and make button
@@ -75,10 +72,10 @@ const Signup = () => {
     setShowPassword(!showPassword);
   };
 
-  // if (loading) {
-  //   // Show loader while data is being fetched
-  //   return <Loader />;
-  // }
+  if (loading) {
+    // Show loader while data is being fetched
+    return <Loader />;
+  }
 
   return (
     <div className="min-h-screen flex  justify-center ">
@@ -143,7 +140,6 @@ const Signup = () => {
           </div>
 
           <form onSubmit={submithandler} className="flex flex-col">
-            
             <span className="text-xs mt-2">Enter address</span>
             <input
               type="email"
