@@ -5,7 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import "./globals.css";
-import { Toaster } from 'sonner'
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,7 +37,7 @@ export default function RootLayout({
           </div>
           {!hideNavbar && <Footer />}
         </ReduxProvider>
-        <Toaster position="bottom-center"/>
+        <Toaster position="bottom-center" />
       </body>
     </html>
   );

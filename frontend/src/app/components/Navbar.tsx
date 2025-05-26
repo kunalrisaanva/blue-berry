@@ -1,10 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import Badge from "@mui/material/Badge";
-import {
-  PiShoppingCartSimpleDuotone,
-  PiUserDuotone,
-} from "react-icons/pi";
+import { PiShoppingCartSimpleDuotone, PiUserDuotone } from "react-icons/pi";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 import SearchBar from "./ui/SearchBar";
@@ -18,7 +15,6 @@ const Navbar = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
 
   const dropdownRef = useRef(null);
-  
 
   // Close dropdown if clicked outside
   useEffect(() => {

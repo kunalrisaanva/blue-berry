@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { useSelector, useDispatch } from "react-redux";
+import { toast } from "sonner";
 import {
   increaseQuantity,
   decreaseQuantity,
@@ -21,6 +22,16 @@ const Page = () => {
   );
   const discount = 2.8;
   const totalAmount = subTotal - discount;
+
+  const handleRemoveFromCart = (id: number, title: string) => {
+    dispatch(removeFromCart(id));
+    toast.success(`${title} removed from the cart!`);
+  };
+
+  const handleResetCart = () => {
+    dispatch(resetCart());
+    toast.success("Cart has been reset!");
+  };
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8">
@@ -54,16 +65,16 @@ const Page = () => {
             </h2>
             <div className="flex justify-between mb-3 text-gray-700 text-sm sm:text-lg">
               <span>SubTotal</span>
-              <span>${subTotal}</span>
+              <span>${subTotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between mb-3 text-gray-700 text-sm sm:text-lg">
               <span>Discount</span>
-              <span>${discount}</span>
+              <span>${discount.toFixed(2)}</span>
             </div>
             <hr className="my-4" />
             <div className="flex justify-between text-base sm:text-xl font-bold">
               <span>Total</span>
-              <span>${totalAmount}</span>
+              <span>${totalAmount.toFixed(2)}</span>
             </div>
             <button className="w-full mt-6 bg-black text-white py-3 rounded-md hover:bg-gray-800 transition">
               Proceed to Checkout
@@ -98,7 +109,7 @@ const Page = () => {
                   <RiDeleteBin6Line
                     size={20}
                     className="cursor-pointer text-gray-600 hover:text-red-800"
-                    onClick={() => dispatch(removeFromCart(item.id))}
+                    onClick={() => handleRemoveFromCart(item.id, item.title)}
                   />
                   <img
                     src={item.image}
@@ -141,7 +152,7 @@ const Page = () => {
             <div className="mt-6">
               <button
                 className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md w-full sm:w-auto"
-                onClick={() => dispatch(resetCart())}
+                onClick={handleResetCart}
               >
                 Reset Cart
               </button>
