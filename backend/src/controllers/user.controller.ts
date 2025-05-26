@@ -18,7 +18,7 @@ function comparePassword(password: string, hashedPassword: string): boolean {
 
 const registerUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { email, password, } = req.body;
+    const { email, password } = req.body;
 
     if (
       [email, password, ].some(
@@ -37,8 +37,8 @@ const registerUser = asyncHandler(
     const hashedPassword = await hashPassword(password);
 
     const existingUser = await db.query(
-      `SELECT * FROM users WHERE email = $1 OR username = $2`,
-      [email,]
+      `SELECT * FROM users WHERE email = $1`,
+      [email]
     );
 
     // Check if user already exists
@@ -47,7 +47,7 @@ const registerUser = asyncHandler(
     }
     // Create new user
     const newUser = await db.query(
-      `INSERT INTO users (email, password, username) VALUES ($1, $2, $3) RETURNING *`,
+      `INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *`,
       [email, hashedPassword]
     );
 
