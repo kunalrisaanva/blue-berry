@@ -1,7 +1,16 @@
 'use client';
 import React, { useState } from 'react';
 
-const Page = () => {
+
+
+type ProfileProps = {
+  onClose: () => void;
+};
+
+
+const Page: React.FC<ProfileProps> = ({ onClose }) => {
+
+
   const [isOpen, setIsOpen] = useState(true);
 
   if (!isOpen) return null;
