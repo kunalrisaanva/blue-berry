@@ -8,13 +8,17 @@ import SearchBar from "./ui/SearchBar";
 import Profile from "@/app/components/Profile";
 
 const Navbar = () => {
-  const cartItems = useSelector((state: any) => state.cart.items);
-  const cartItemCount = cartItems.length;
-
+  const cartItems = useSelector((state: any) => state.cart.items); // Correct usage of useSelector
+  const [cartItemCount, setCartItemCount] = useState(0); // Local state for cart item count
   const [showDropdown, setShowDropdown] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
 
   const dropdownRef = useRef(null);
+
+  // Update cart item count whenever cartItems changes
+  useEffect(() => {
+    setCartItemCount(cartItems.length);
+  }, [cartItems]);
 
   // Close dropdown if clicked outside
   useEffect(() => {
