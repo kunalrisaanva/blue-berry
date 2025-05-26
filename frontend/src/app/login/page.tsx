@@ -7,7 +7,7 @@ import Button from "../components/ui/Button";
 const Login = () => {
 
 
-    const [ email ,setEmail] = useState("");
+  const [ email ,setEmail] = useState("");
   
   return (
     <div className="min-h-screen flex  justify-center ">
