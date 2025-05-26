@@ -21,7 +21,7 @@ function Main({}: Props) {
         setLoading(true); // Set loading to true before fetching data
         // const NEXT_BASE_API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_API_UR}/api/v1/products/all-prodcuts`
+          `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/products/all-prodcuts`
         );
         console.log("response", response.data);
         setCartData(response.data);
