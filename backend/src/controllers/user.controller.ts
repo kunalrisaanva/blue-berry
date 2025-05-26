@@ -18,10 +18,10 @@ function comparePassword(password: string, hashedPassword: string): boolean {
 
 const registerUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { email, password, username } = req.body;
+    const { email, password, } = req.body;
 
     if (
-      [email, password, username].some(
+      [email, password, ].some(
         (field) => field === undefined || field === null || field === ""
       )
     ) {
@@ -32,17 +32,13 @@ const registerUser = asyncHandler(
         new ApiError(400, "Password must be at least 6 characters long")
       );
     }
-    if (username.length < 3) {
-      return next(
-        new ApiError(400, "Username must be at least 3 characters long")
-      );
-    }
+
 
     const hashedPassword = await hashPassword(password);
 
     const existingUser = await db.query(
       `SELECT * FROM users WHERE email = $1 OR username = $2`,
-      [email, username]
+      [email,]
     );
 
     // Check if user already exists
@@ -52,7 +48,7 @@ const registerUser = asyncHandler(
     // Create new user
     const newUser = await db.query(
       `INSERT INTO users (email, password, username) VALUES ($1, $2, $3) RETURNING *`,
-      [email, hashedPassword, username]
+      [email, hashedPassword]
     );
 
     if (newUser && newUser.rowCount !== null && newUser.rowCount > 0) {
