@@ -54,16 +54,16 @@ const Page = () => {
             </h2>
             <div className="flex justify-between mb-3 text-gray-700 text-sm sm:text-lg">
               <span>SubTotal</span>
-              <span>${subTotal.toFixed(2)}</span>
+              <span>${subTotal}</span>
             </div>
             <div className="flex justify-between mb-3 text-gray-700 text-sm sm:text-lg">
               <span>Discount</span>
-              <span>${discount.toFixed(2)}</span>
+              <span>${discount}</span>
             </div>
             <hr className="my-4" />
             <div className="flex justify-between text-base sm:text-xl font-bold">
               <span>Total</span>
-              <span>${totalAmount.toFixed(2)}</span>
+              <span>${totalAmount}</span>
             </div>
             <button className="w-full mt-6 bg-black text-white py-3 rounded-md hover:bg-gray-800 transition">
               Proceed to Checkout
@@ -110,7 +110,7 @@ const Page = () => {
 
                 {/* price */}
                 <div className="text-center text-gray-700 font-medium sm:block hidden">
-                  ${item.price.toFixed(2)}
+                  ${item.price}
                 </div>
 
                 {/* quantity */}
@@ -132,7 +132,7 @@ const Page = () => {
 
                 {/* total */}
                 <div className="text-right text-gray-700 font-medium sm:block hidden">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  ${item.price * item.quantity}
                 </div>
               </div>
             ))}
