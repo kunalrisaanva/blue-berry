@@ -13,26 +13,29 @@ function Main({}: Props) {
   const [error, setError] = useState<string | null>(null); // State to track errors
   const [cardsData, setcardsData] = useState<any[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true); // Set loading to true before fetching data
-        // const NEXT_BASE_API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/products/all-prodcuts`
-        );
-        const responseData = response.data.data;
-        console.log("response", responseData);
-        setcardsData(responseData);
-      } catch (error) {
-        setError(error instanceof Error ? error.message : String(error));
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false); // Set loading to false after fetching data
-      }
-    };
-    fetchData();
-  }, []);
+  //  iife function to fetch data
+  (async () => {
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          setLoading(true); // Set loading to true before fetching data
+          // const NEXT_BASE_API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
+          const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/products/all-prodcuts`
+          );
+          const responseData = response.data.data;
+          console.log("response", responseData);
+          setcardsData(responseData);
+        } catch (error) {
+          setError(error instanceof Error ? error.message : String(error));
+          console.error("Error fetching data:", error);
+        } finally {
+          setLoading(false); // Set loading to false after fetching data
+        }
+      };
+      fetchData();
+    }, []);
+  })();
 
   //  name imageUrl price category previousprice description isnew rating inStock qty
 
@@ -41,7 +44,7 @@ function Main({}: Props) {
     return <Loader />;
   }
 
-  if(error) {
+  if (error) {
     // Show error message if there was an error fetching data
     return <div className="text-red-500 text-center">Error: {error}</div>;
   }

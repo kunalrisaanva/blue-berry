@@ -1,28 +1,84 @@
-"use client"
+"use client";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import axios from "axios";
+import Loader from "../components/Loder";
+import { toast } from "sonner";
+import Router, { useRouter } from "next/router";
 
 const Signup = () => {
 
-    const [formData, setFormData] = React.useState({
-        email: "",
-        password: "",
-    });
 
-    // interface FormData {
-    //     email: string;
-    //     password: string;
-    // }
+  // const router = useRouter();
 
-    const submithandler = (e: React.FormEvent<HTMLFormElement>): void => {
-        e.preventDefault();
-        console.log(formData);
-        setFormData({
-            email: "",
-            password: "",
-        });
+  const [formData, setFormData] = React.useState({
+    email: "",
+    password: "",
+  });
+
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null); // State to track errors
+
+  // interface FormData {
+  //     email: string;
+  //     password: string;
+  // }
+
+  const submithandler = (e: React.FormEvent<HTMLFormElement>): void => {
+    e.preventDefault();
+
+    if (!formData.email || !formData.password) {
+      alert("Email and password are required");
+      return;
     }
+
+    console.log(formData);
+
+    // shet loader true
+
+    // setLoading(true);
+
+    // Here you can handle the form submission, e.g., send data to an API
+
+    axios
+      .post(
+        `https://blue-berry.onrender.com/api/v1/users/register`,
+        formData
+      )
+      .then((response) => {
+        console.log("Signup successful:", response.data);
+        // Handle successful signup, e.g., redirect to login or dashboard
+
+        // router.push("/")
+        toast.success(
+          "Signup successful! Please check your email for verification."
+        );
+      })
+      .catch((error) => {
+        console.error("Error during signup:", error);
+      });
+
+    setFormData({
+      email: "",
+      password: "",
+    });
+  };
+
+  // todo  password toggler working but add icon and make button
+  const [showPassword, setShowPassword] = React.useState(true);
+
+  const passwordToggleHandler = () => {
+    // Toggle the visibility of the password
+    // This will switch between showing and hiding the password
+    // add icon
+    setShowPassword(!showPassword);
+  };
+
+  // if (loading) {
+  //   // Show loader while data is being fetched
+  //   return <Loader />;
+  // }
 
   return (
     <div className="min-h-screen flex  justify-center ">
@@ -64,7 +120,7 @@ const Signup = () => {
         <h1 className="text-center text-2xl font-bold">Welcome Back</h1>
 
         <p className="text-center text-gray-600 text-sm">
-          Sign in to access your account{" "}
+          Sign in to access your account
         </p>
 
         <div className="bg-white shadow-2xl mt-[5rem] rounded p-3 h-[20rem] inset-shadow-2xs">
@@ -86,29 +142,46 @@ const Signup = () => {
             <div className="flex-grow h-px bg-gray-200"></div>
           </div>
 
-
-        <form onSubmit={submithandler} className="flex flex-col">
-
+          <form onSubmit={submithandler} className="flex flex-col">
+            
             <span className="text-xs mt-2">Enter address</span>
-            <input type="email" value={formData.email} onChange={(e) => setFormData({...formData,email:e.target.value})} placeholder="Enter your email address" className="mt-2 p-1 border border-gray-300 rounded-md "/>
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+              placeholder="Enter your email address"
+              className="mt-2 p-2 border border-gray-300 rounded-md "
+            />
 
             <span className="text-xs mt-2">Password</span>
-            <input type="email" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} placeholder="Enter your Password" className="mt-2 p-1 border border-gray-300 rounded-md "/>
-          <button type="submit" className="text-xs bg-black text-white p-3 rounded-md mt-4 cursor-pointer">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
+              placeholder="Enter your Password"
+              className="mt-2 p-2 border border-gray-300 rounded-md "
+            />
+            <button
+              type="submit"
+              className="text-xs bg-black text-white p-3 rounded-md mt-4 cursor-pointer"
+            >
               Continue
             </button>
+          </form>
 
-        </form>
+          <div className="flex-grow h-px bg-gray-200 mt-7"></div>
 
-        <div className="flex-grow h-px bg-gray-200 mt-7"></div>
-
-        <p className="text-sm text-gray-500 text-center mt-2">Don’t have an account?
-         <Link href={"/login"}>
-        <span className="text-black">Sign up</span>
-        </Link></p>
-        
+          <p className="text-sm text-gray-500 text-center mt-2">
+            Don’t have an account?
+            <Link href={"/login"}>
+              <span className="text-black">Sign up</span>
+            </Link>
+          </p>
         </div>
-
       </div>
     </div>
   );
