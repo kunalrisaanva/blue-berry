@@ -13,7 +13,7 @@ const Navbar = () => {
   const [cartItemCount, setCartItemCount] = useState(0); // Local state for cart item count
   const [showDropdown, setShowDropdown] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track user login status
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // Track user login status
 
   const dropdownRef = useRef(null);
   const router = useRouter(); // Initialize useRouter
