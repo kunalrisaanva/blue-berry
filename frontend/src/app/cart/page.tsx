@@ -40,7 +40,7 @@ const Page = () => {
         <div className="text-center py-20">
           <div>
             <img
-              src="/cart.gif"
+              src="/emptyCart.png"
               alt="Empty Cart"
               className="mx-auto mb-4 w-40 sm:w-60"
             />
