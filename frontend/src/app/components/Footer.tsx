@@ -9,8 +9,15 @@ function Footer({}: Props) {
         {/* Left Text */}
         <p className="text-sm text-gray-600 text-center sm:text-left">
           Copyright © 2025{" "}
-          <span className="text-blue-600 font-medium">Future Nodes</span> all
-          rights reserved.
+          <a
+            href="https://futurenodes.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 font-medium hover:underline"
+          >
+            Future Nodes
+          </a>{" "}
+          all rights reserved.
         </p>
 
         {/* Payment Icons */}
