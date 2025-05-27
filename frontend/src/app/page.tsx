@@ -37,8 +37,6 @@ function Main({}: Props) {
     }, []);
   })();
 
-  //  name imageUrl price category previousprice description isnew rating inStock qty
-
   if (loading) {
     // Show loader while data is being fetched
     return <Loader />;

@@ -11,23 +11,23 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
   );
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-white/90 backdrop-blur-md rounded-md shadow-2xl w-full max-w-4xl h-[700px] flex relative">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+      <div className="bg-white/90 backdrop-blur-md rounded-md shadow-2xl w-full max-w-4xl h-[90vh] md:h-[700px] flex flex-col md:flex-row relative overflow-hidden">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold z-10"
         >
           &times;
         </button>
 
         {/* Sidebar */}
-        <div className="w-1/3 border-r p-6 bg-white/60 backdrop-blur-sm rounded-md">
+        <div className="w-full md:w-1/3 border-b md:border-b-0 md:border-r p-6 bg-white/60 backdrop-blur-sm rounded-t-md md:rounded-l-md">
           <h2 className="text-xl font-semibold mb-2">Account</h2>
           <p className="text-sm text-gray-500 mb-4">
             Manage your account info.
           </p>
-          <ul className="space-y-3">
+          <ul className="space-y-3 flex  flex-col gap-4">
             <li
               className={`flex items-center space-x-2 cursor-pointer ${
                 selectedTab === "profile"
@@ -51,7 +51,7 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
               <span>Security</span>
             </li>
           </ul>
-          <div className="absolute bottom-4 left-6 text-xs text-gray-400">
+          <div className="mt-8 md:absolute bottom-4 left-6 text-xs text-gray-400">
             Secured by{" "}
             <span className="font-semibold text-gray-600">Clerk</span>
             <br />
@@ -62,7 +62,7 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
         </div>
 
         {/* Main Content */}
-        <div className="w-2/3 p-6 overflow-y-auto">
+        <div className="w-full md:w-2/3 p-6 overflow-y-auto">
           {selectedTab === "profile" ? (
             <>
               <h3 className="text-lg font-semibold mb-4">Profile details</h3>
