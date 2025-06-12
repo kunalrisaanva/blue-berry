@@ -10,7 +10,7 @@ import { sendEmail } from "../utils/sendEmail";
 // import { sendEmail } from "../utils/sendEmail";
 // import  { sendEmail } from "../utils/sendEmail";
 
-function generateNumericOTP(length: number = 6): number {
+function generateNumericOTP(length: number = 4): number {
   let otp = "";
   for (let i = 0; i < length; i++) {
     otp += Math.floor(Math.random() * 10).toString();
