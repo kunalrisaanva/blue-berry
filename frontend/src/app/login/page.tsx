@@ -2,11 +2,31 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import axios from "axios";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Handle login logic here
+    console.log("Email:", email);
+
+    axios.post(`${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/login`, {
+      email,
+      password,
+    }).then( response => {
+      if(response.status === 200) {
+        // Assuming the response contains user data
+        console.log("Login successful:", response.data);
+        // Redirect to home or dashboard
+        window.location.href = "/";
+      }
+    })
+
+  }
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-white px-4">
@@ -31,7 +51,7 @@ const Login = () => {
           Sign in to access your account
         </p>
 
-        <form className="w-full">
+        <form className="w-full" onSubmit={handleSubmit}>
           <label className="block text-sm mb-1">Enter address</label>
           <input
             type="email"
