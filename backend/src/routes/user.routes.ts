@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { registerUser , loginUser } from "../controllers/user.controller";
+import { registerUser , loginUser, verifyOtp } from "../controllers/user.controller";
 import { requestPasswordReset , resetPassword } from "../controllers/resetPassword.controller";
 
 import  passport from "../middleware/passport.middleware"
@@ -8,6 +8,7 @@ const router = Router();
 
 // unprotected routes
 router.route("/register").post(registerUser);
+router.route("/verify-otp").post(verifyOtp)
 router.route("/login").post(loginUser);
 
 // Reset password routes

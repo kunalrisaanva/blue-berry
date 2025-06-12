@@ -63,8 +63,8 @@ const registerUser = asyncHandler(
     const response = await sendEmail(email, otp.toString(), "registration");
     // Create new user
     const newUser = await db.query(
-      `INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *`,
-      [email, hashedPassword]
+      `INSERT INTO users (email, password, otp) VALUES ($1, $2, $3) RETURNING *`,
+      [email, hashedPassword, otp]
     );
 
     if (response.success === true) {
@@ -133,6 +133,29 @@ const loginUser = asyncHandler(
   }
 );
 
+const verifyOtp = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email, otp } = req.body;
+    if ([email, otp].some((field) => field === undefined || field === null || field === "")) {
+      return next(new ApiError(400, "Email and OTP are required"));
+    }
+    // Check if user exists
+    const user = await db.query(`SELECT * FROM users WHERE email = $1`, [email]);
+    if (user.rowCount === 0) {
+      return next(new ApiError(404, "User not found"));
+    }
+    const userData = user.rows[0];
+    // Check if OTP matches
+    if (userData.otp !== otp) {
+      return next(new ApiError(401, "Invalid OTP"));
+    }
+
+    // OTP is valid, proceed with user verification
+    const response = new ApiResponse(200, userData, "OTP verified successfully");
+    return res.status(200).json(response);
+  }
+);
+
 // const getUser = (req: Request, res: Response, next: NextFunction) => {
 //   // Validate get user details
 //   // postgress: validate email, password, username
@@ -154,4 +177,4 @@ const loginUser = asyncHandler(
 //   // postgress: validate email, password, username
 // };
 
-export { registerUser, loginUser };
+export { registerUser, loginUser, verifyOtp };
