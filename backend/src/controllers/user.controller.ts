@@ -6,6 +6,17 @@ import { asyncHandler } from "../utils/AsyncHandler";
 import { db } from "../dbConnection/db";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { sendEmail } from "../utils/sendEmail";
+// import { sendEmail } from "../utils/sendEmail";
+// import  { sendEmail } from "../utils/sendEmail";
+
+function generateNumericOTP(length: number = 6): number {
+  let otp = "";
+  for (let i = 0; i < length; i++) {
+    otp += Math.floor(Math.random() * 10).toString();
+  }
+  return parseInt(otp, 10);
+}
 
 async function hashPassword(password: string): Promise<string> {
   const salt = bcrypt.genSaltSync(10);
@@ -21,7 +32,7 @@ const registerUser = asyncHandler(
     const { email, password } = req.body;
 
     if (
-      [email, password, ].some(
+      [email, password].some(
         (field) => field === undefined || field === null || field === ""
       )
     ) {
@@ -32,7 +43,6 @@ const registerUser = asyncHandler(
         new ApiError(400, "Password must be at least 6 characters long")
       );
     }
-
 
     const hashedPassword = await hashPassword(password);
 
@@ -45,18 +55,32 @@ const registerUser = asyncHandler(
     if (existingUser.rowCount !== null && existingUser.rowCount > 0) {
       throw next(new ApiError(400, "User already exists"));
     }
+
+    // create otp
+    const otp = generateNumericOTP();
+    // send mail
+
+    const response = await sendEmail(email, otp.toString(), "registration");
     // Create new user
     const newUser = await db.query(
       `INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *`,
       [email, hashedPassword]
     );
 
-    if (newUser && newUser.rowCount !== null && newUser.rowCount > 0) {
-      const user = newUser.rows[0];
-      const response = new ApiResponse(201, user, "User created successfully");
-      return res.status(201).json(response);
+    if (response.success === true) {
+      if (newUser && newUser.rowCount !== null && newUser.rowCount > 0) {
+        const user = newUser.rows[0];
+        const response = new ApiResponse(
+          201,
+          user,
+          "User created successfully"
+        );
+        return res.status(201).json(response);
+      } else {
+        return next(new ApiError(500, "User creation failed"));
+      }
     } else {
-      return next(new ApiError(500, "User creation failed"));
+      return next(new ApiError(500, "something went wrong while sending OTP."));
     }
   }
 );

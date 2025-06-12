@@ -5,7 +5,7 @@ import { db } from "../dbConnection/db";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
-import { sendResetEmail } from "../utils/sendEmail";
+import { sendEmail } from "../utils/sendEmail";
 
 async function hashPassword(password: string): Promise<string> {
   const salt = bcrypt.genSaltSync(10);
@@ -42,7 +42,7 @@ export const requestPasswordReset = asyncHandler(
     );
 
     // send user email for reset password link
-    await sendResetEmail(email, token);
+    await sendEmail(email, token, "reset");
 
     return next(new ApiResponse(200, "Sent Password Reset Email."));
   }
