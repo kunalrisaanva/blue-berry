@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import cartReducer from "./cartSlice";
+import authSlice from "./authSlice"
 import {
   loadCartFromLocalStorage,
   saveCartToLocalStorage,
@@ -8,6 +9,7 @@ import {
 export const store = configureStore({
   reducer: {
     cart: cartReducer,
+    auth: authSlice, // Add the auth slice to the store
   },
   preloadedState: {
     cart: {

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 
 interface ProfileProps {
   onClose: () => void;
@@ -9,6 +10,10 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
   const [selectedTab, setSelectedTab] = useState<"profile" | "security">(
     "profile"
   );
+
+ const user = useSelector((state: any) => state.auth.user);
+console.log("User details:", user);
+
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
@@ -85,7 +90,7 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
                   Email addresses
                 </label>
                 <div className="flex items-center justify-between">
-                  <span>kunalrisaanva12@gmail.com</span>
+                  <span>{user?.email}</span>
                   <span className="text-xs text-white bg-gray-400 rounded px-2 py-0.5">
                     Primary
                   </span>

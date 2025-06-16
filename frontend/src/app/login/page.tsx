@@ -3,11 +3,22 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import axios from "axios";
+import { imageOptimizer } from "next/dist/server/image-optimizer";
+// import { D } from "@reduxjs/toolkit";
+import { useDispatch,useSelector } from "react-redux";
+import { loginSuccess } from "@/lib/authSlice";
+import Loader from "../components/Loder";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -17,16 +28,50 @@ const Login = () => {
     axios.post(`${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/login`, {
       email,
       password,
-    }).then( response => {
+    }).then((response: any) => {
       if(response.status === 200) {
-        // Assuming the response contains user data
-        console.log("Login successful:", response.data);
-        // Redirect to home or dashboard
-        window.location.href = "/";
+        setIsLoading(true);
+        // console.log("response from login api ===> ",response.data.data);
+        dispatch(loginSuccess(response.data.data));
+        // console.log("Login successful:", response.data.data.safeUserData);
+        setIsLoading(false);
+        router.push("/"); // Redirect to home page after successful login
+        toast.success("Login successful!");
+      } else {
+        // Handle error response
+        const e = new Error("Login failed. Please check your credentials.");
+        toast.error(e.message);
+        setIsLoading(false);
       }
-    })
+    }).catch(e => {setIsLoading(false); console.log("ERROR-",e);}).finally(() => {
+      setIsLoading(false);
+      // setError(e instanceof Error ? e.message : String(e));
+
+    });
 
   }
+
+  // ifeeldeadly@gmail.com
+
+  // console.log(userDetails, "userDetails");
+
+  if(isLoading) {
+    return <Loader/>
+  }
+
+  // if(error) {
+  //     return (
+  //       <div className="min-h-screen flex justify-center items-center bg-white px-4">
+  //         <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-6">
+  //           <h2 className="text-2xl font-semibold text-center mb-4">Error</h2>
+  //           <p className="text-red-500 text-center">{error}</p>
+  //           <Link href="/login" className="text-blue-600 hover:underline mt-4 block text-center">
+  //             Go back to login
+  //           </Link>
+  //         </div>
+  //       </div>
+  //     );
+  //   }
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-white px-4">
