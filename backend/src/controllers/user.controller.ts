@@ -126,7 +126,7 @@ const loginUser = asyncHandler(
     const { password: hashedPassword, ...safeUserData } = userData;
     const response = new ApiResponse(
       200,
-      { token, safeUserData },
+      { token, ...safeUserData },
       "Login successful"
     );
     return res.status(200).json(response);
