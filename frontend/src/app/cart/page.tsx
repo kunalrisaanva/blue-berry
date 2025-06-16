@@ -10,6 +10,7 @@ import {
   resetCart,
   removeFromCart,
 } from "../../lib/cartSlice";
+import Button from "../components/ui/Button";
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -76,9 +77,9 @@ const Page = () => {
               <span>Total</span>
               <span>${totalAmount.toFixed(2)}</span>
             </div>
-            <button className="w-full mt-6 bg-black text-white py-3 rounded-md hover:bg-gray-800 transition">
+            <Button className="flex items-center justify-center w-full text-xs text-center bg-black text-white p-3 rounded-md mt-4 cursor-pointer">
               Proceed to Checkout
-            </button>
+            </Button>
             <Link href="/">
               <p className="text-center text-gray-600 mt-4 hover:underline">
                 Continue Shopping

@@ -7,17 +7,19 @@ import { useRouter } from "next/navigation"; // Import useRouter
 import { useSelector } from "react-redux";
 import SearchBar from "./ui/SearchBar";
 import Profile from "@/app/components/Profile";
+import { FaSignInAlt } from "react-icons/fa";
 
 const Navbar = () => {
   const cartItems = useSelector((state: any) => state.cart.items); // Get cart items from Redux store
   const [cartItemCount, setCartItemCount] = useState(0); // Local state for cart item count
   const [showDropdown, setShowDropdown] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(useSelector((state: any) => state.auth.isAuthenticated)); // Track user login status
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    useSelector((state: any) => state.auth.isAuthenticated)
+  ); // Track user login status
 
   const dropdownRef = useRef(null);
   const router = useRouter(); // Initialize useRouter
-
 
   // Update cart item count whenever cartItems changes
   useEffect(() => {
@@ -51,7 +53,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="p-4 shadow-md flex flex-row justify-center">
+      <nav className="p-4 shadow-md flex flex-row justify-center   ">
         <div className="flex flex-col md:flex-row w-[1300px] gap-4 p-2">
           {/* Logo */}
           <div className="w-auto">
@@ -132,10 +134,11 @@ const Navbar = () => {
               </div>
             ) : (
               <button
-                onClick={handleLogin} // Navigate to login page
-                className="bg-blue-500 text-white h-[3rem] w-24 flex items-center justify-center gap-2 rounded shadow-md hover:bg-blue-700 cursor-pointer"
+                onClick={handleLogin}
+                className="bg-[#6D7FDA] h-[3rem] w-24 flex items-center justify-center gap-2 text-white rounded shadow-md hover:bg-[#5a6bc4] cursor-pointer"
               >
-                Login
+                <FaSignInAlt size={18} />
+                <span className="hidden sm:inline">Login</span>
               </button>
             )}
           </div>

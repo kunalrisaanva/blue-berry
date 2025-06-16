@@ -5,16 +5,18 @@ import { useRouter } from "next/navigation";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { toast } from "sonner";
 import axios from "axios";
-
+import Button from "../components/ui/Button";
+  
 const Signup = () => {
   const router = useRouter();
   const [formData, setFormData] = React.useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = React.useState(false);
   // const [step, setStep] = React.useState("otp");
-    const [step, setStep] = React.useState<"signup" | "otp">("signup");
+  const [step, setStep] = React.useState<"signup" | "otp">("signup");
   const [otp, setOtp] = React.useState(["", "", "", ""]);
   const [resendCount, setResendCount] = React.useState(0);
   const inputsRef = React.useRef<(HTMLInputElement | null)[]>([]);
+
 
   interface RegisterResponse {
     success: boolean;
@@ -116,7 +118,7 @@ const Signup = () => {
 
         <h2 className="text-2xl font-semibold text-center mb-1">Welcome Back</h2>
         <p className="text-center text-gray-500 text-sm mb-6">
-          Sign in to access your account
+         Join ShopTech for the best shopping experience
         </p>
 
         {step === "signup" && (
@@ -178,12 +180,12 @@ const Signup = () => {
               </button>
             </div>
 
-            <button
+            <Button
               type="submit"
-              className="w-full bg-black text-white py-2 rounded-md text-sm font-semibold"
+              className="flex items-center justify-center w-full text-xs text-center bg-black text-white p-3 rounded-md mt-4 cursor-pointer"
             >
               Continue
-            </button>
+            </Button>
           </form>
         )}
 
@@ -209,19 +211,19 @@ const Signup = () => {
             </div>
 
             <div className="flex flex-col gap-3 items-center">
-              <button
+              <Button
                 onClick={handlerVerifyOtp}
                 className="bg-black text-white py-2 px-6 rounded-md text-sm w-full max-w-[200px]"
               >
                 Verify OTP
-              </button>
+              </Button>
 
-              <button
+              <Button
                 onClick={handleResend}
                 className="text-sm text-blue-500 hover:underline"
               >
                 Resend OTP {resendCount > 0 && `(${resendCount})`}
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -230,7 +232,7 @@ const Signup = () => {
         <p className="text-sm text-gray-500 text-center mt-6">
           Don’t have an account?{" "}
           <Link href="/login" className="text-blue-600 hover:underline">
-            Sign up
+            Sign in
           </Link>
         </p>
       </div>

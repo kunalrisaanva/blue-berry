@@ -10,6 +10,7 @@ import { loginSuccess } from "@/lib/authSlice";
 import Loader from "../components/Loder";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import Button from "../components/ui/Button";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -130,12 +131,16 @@ const Login = () => {
             </button>
           </div>
 
+           <Button type="submit" className="flex items-center justify-center w-full text-xs text-center bg-black text-white p-3 rounded-md mt-4 cursor-pointer">
+              Continue
+            </Button>
+{/* 
           <button
             type="submit"
             className="w-full bg-black text-white py-2 rounded-md text-sm font-semibold"
           >
             Continue
-          </button>
+          </button> */}
         </form>
 
         <p className="text-sm text-gray-500 text-center mt-6">
