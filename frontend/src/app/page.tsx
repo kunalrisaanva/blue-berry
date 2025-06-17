@@ -48,7 +48,7 @@ function Main({}: Props) {
   }
 
   return (
-    <div className="w-full pt-[4.5rem]"> {/* Add top padding here */}
+    <div className="w-full "> {/* Add top padding here */}
       <Slider />
 
       <div className="my-6 ">

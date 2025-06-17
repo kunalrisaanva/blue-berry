@@ -49,7 +49,7 @@ const Slider: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full mt-2 overflow-hidden rounded-lg shadow-lg bg-white border-2 border-gray-200">
+    <div className="relative w-full mt-[8rem] overflow-hidden rounded-lg shadow-lg bg-white border-2 border-gray-200">
       {/* Slides */}
       <div
         className="flex transition-transform duration-500"

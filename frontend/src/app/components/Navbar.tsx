@@ -53,7 +53,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full z-50 bg-white shadow-md min-h-[4.5rem] flex flex-row justify-center">
+      <nav className="fixed top-0 left-0 w-full z-50 bg-white shadow-md min-h-[4.5rem] flex flex-row justify-center ">
         <div className="flex flex-col md:flex-row w-[1300px] gap-4 p-2">
           {/* Logo */}
           <div className="w-auto">

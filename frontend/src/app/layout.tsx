@@ -33,7 +33,7 @@ export default function RootLayout({
         <ReduxProvider>
           {!hideNavbar && <Navbar />}
           <div className=" flex  justify-center ">
-            <div className="w-full max-w-[1300px] p-2 ">{children}</div>
+            <div className="w-full max-w-[1300px] pt-[4.5rem] ">{children}</div>
           </div>
           {!hideNavbar && <Footer />}
         </ReduxProvider>
