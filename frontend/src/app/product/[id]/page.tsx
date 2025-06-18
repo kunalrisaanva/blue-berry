@@ -67,7 +67,7 @@ const ProductPage: React.FC = () => {
   };
 
   return (
-    <div className="py-6 font-sans">
+    <div className="py-6 mt-20 font-sans">
       <div className="mx-auto bg-white rounded-2xl shadow-md p-6 md:flex gap-10">
         {/* Product Image */}
         <div className="md:w-1/2 flex justify-center items-center mb-6 md:mb-0">

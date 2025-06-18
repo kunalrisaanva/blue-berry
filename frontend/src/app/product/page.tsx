@@ -6,8 +6,10 @@ import { FaCodeCompare } from "react-icons/fa6";
 
 const ProductPage: React.FC = () => {
   return (
-    <div className="bg-gray-50 font-sans pt-[4.5rem]"> {/* Use pt-[4.5rem] */}
-      <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-md p-6 md:flex gap-10">
+    <div className="bg-gray-50 font-sans pt-[4.5rem]">
+      {" "}
+      {/* Use pt-[4.5rem] */}
+      <div className="max-w-6xl mx-auto bg-amber-500 rounded-2xl shadow-md p-6 md:flex gap-10">
         {/* Product Image */}
         <div className="md:w-1/2 flex justify-center items-center mb-6 md:mb-0">
           <div className="overflow-hidden rounded-xl">

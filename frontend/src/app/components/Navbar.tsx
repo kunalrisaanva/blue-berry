@@ -54,7 +54,7 @@ const Navbar = () => {
   return (
     <>
       <nav className="fixed top-0 left-0 w-full z-50 bg-white shadow-md min-h-[4.5rem] flex flex-row justify-center ">
-        <div className="flex flex-col md:flex-row w-[1300px] gap-4 p-2">
+        <div className="flex flex-col md:flex-row w-[1300px] gap-4 p-2  md:items-center">
           {/* Logo */}
           <div className="w-auto">
             <Link href="/">
@@ -79,7 +79,7 @@ const Navbar = () => {
             <Link href="/cart">
               <Badge badgeContent={cartItemCount} color="secondary">
                 <button className="bg-white h-[3rem] w-24 flex items-center justify-center gap-2 text-black rounded shadow-md hover:bg-gray-100 cursor-pointer">
-                  <PiShoppingCartSimpleDuotone size={20} color="blue" />
+                  <PiShoppingCartSimpleDuotone size={24} color="blue" />
                 </button>
               </Badge>
             </Link>
