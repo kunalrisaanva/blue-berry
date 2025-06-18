@@ -6,7 +6,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { toast } from "sonner";
 import axios from "axios";
 import Button from "../components/ui/Button";
-  
+
 const Signup = () => {
   const router = useRouter();
   const [formData, setFormData] = React.useState({ email: "", password: "" });
@@ -16,7 +16,6 @@ const Signup = () => {
   const [otp, setOtp] = React.useState(["", "", "", ""]);
   const [resendCount, setResendCount] = React.useState(0);
   const inputsRef = React.useRef<(HTMLInputElement | null)[]>([]);
-
 
   interface RegisterResponse {
     success: boolean;
@@ -54,7 +53,6 @@ const Signup = () => {
       const receivedOtp = response.data.data.otp;
       setOtp(receivedOtp.split("")); // Convert OTP string to array
       setStep("otp");
-    
     } catch (err) {
       toast.error("Registration failed.");
       console.error(err);
@@ -62,25 +60,20 @@ const Signup = () => {
   };
 
   const handlerVerifyOtp = async () => {
-    
+    const verifyResponse = await axios.post(
+      `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/verify-otp`,
+      { email: formData.email, otp: otp.join("") }
+    );
 
-     const verifyResponse = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/verify-otp`,
-        { email: formData.email, otp:otp.join("") }
-      );
+    // console.log(verifyResponse);
 
-      // console.log(verifyResponse);
-
-      if(verifyResponse.status === 200) {
-        toast.success("Registration successful!");
-        router.push("/login");
-      }
-      else {
-        toast.error("OTP verification failed.");
-      }
-
-
-  }
+    if (verifyResponse.status === 200) {
+      toast.success("Registration successful!");
+      router.push("/login");
+    } else {
+      toast.error("OTP verification failed.");
+    }
+  };
 
   const handleOtpChange = (value: string, index: number) => {
     if (!/^[0-9]*$/.test(value)) return;
@@ -107,7 +100,9 @@ const Signup = () => {
     <div className="min-h-screen flex justify-center items-center bg-white px-4">
       <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-6">
         <div className="flex justify-between items-center mb-6">
-          <button onClick={handleBack} className="text-gray-500">←</button>
+          <button onClick={handleBack} className="text-gray-500">
+            ←
+          </button>
           <img
             src="https://berry.reactbd.com/_next/static/media/logo.8fe5d04c.png"
             alt="Blue Berry"
@@ -116,9 +111,11 @@ const Signup = () => {
           <div className="w-5" />
         </div>
 
-        <h2 className="text-2xl font-semibold text-center mb-1">Welcome Back</h2>
+        <h2 className="text-2xl font-semibold text-center mb-1">
+          Create an Account
+        </h2>
         <p className="text-center text-gray-500 text-sm mb-6">
-         Join ShopTech for the best shopping experience
+          Join ShopTech for the best shopping experience
         </p>
 
         {step === "signup" && (
@@ -131,8 +128,6 @@ const Signup = () => {
               />
               Continue with Google
             </button>
-
-
 
             <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
@@ -189,9 +184,6 @@ const Signup = () => {
           </form>
         )}
 
-
-
-
         {step === "otp" && (
           <div className="text-center">
             <p className="text-sm mb-4">Enter 4-digit OTP</p>
@@ -202,7 +194,6 @@ const Signup = () => {
                   key={index}
                   type="text"
                   maxLength={1}
-                  value={digit}
                   ref={(el) => { inputsRef.current[index] = el; }}
                   onChange={(e) => handleOtpChange(e.target.value, index)}
                   className="w-10 h-12 text-center text-lg border rounded-md focus:outline-none"
@@ -227,7 +218,6 @@ const Signup = () => {
             </div>
           </div>
         )}
-
 
         <p className="text-sm text-gray-500 text-center mt-6">
           Don’t have an account?{" "}

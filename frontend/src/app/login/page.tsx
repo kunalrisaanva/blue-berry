@@ -5,7 +5,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import axios from "axios";
 import { imageOptimizer } from "next/dist/server/image-optimizer";
 // import { D } from "@reduxjs/toolkit";
-import { useDispatch,useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess } from "@/lib/authSlice";
 import Loader from "../components/Loder";
 import { toast } from "sonner";
@@ -26,38 +26,47 @@ const Login = () => {
     // Handle login logic here
     console.log("Email:", email);
 
-    axios.post(`${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/login`, {
-      email,
-      password,
-    }).then((response: any) => {
-      if(response.status === 200) {
-        setIsLoading(true);
-        // console.log("response from login api ===> ",response.data.data);
-        dispatch(loginSuccess(response.data.data));
-        // console.log("Login successful:", response.data.data.safeUserData);
+    axios
+      .post(`${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/login`, {
+        email,
+        password,
+      })
+      .then((response: any) => {
+        if (response.status === 200) {
+          setIsLoading(true);
+          // console.log("response from login api ===> ",response.data.data);
+          dispatch(loginSuccess(response.data.data));
+          // console.log("Login successful:", response.data.data.safeUserData);
+          setIsLoading(false);
+          router.push("/"); // Redirect to home page after successful login
+          toast.success("Login successful!");
+        } else {
+          // Handle error response
+          const e = new Error("Login failed. Please check your credentials.");
+          toast.error(e.message);
+          setIsLoading(false);
+        }
+      })
+      .catch((e) => {
         setIsLoading(false);
-        router.push("/"); // Redirect to home page after successful login
-        toast.success("Login successful!");
-      } else {
-        // Handle error response
-        const e = new Error("Login failed. Please check your credentials.");
-        toast.error(e.message);
+        console.log("ERROR-", e);
+      })
+      .finally(() => {
         setIsLoading(false);
-      }
-    }).catch(e => {setIsLoading(false); console.log("ERROR-",e);}).finally(() => {
-      setIsLoading(false);
-      // setError(e instanceof Error ? e.message : String(e));
+        // setError(e instanceof Error ? e.message : String(e));
+      });
+  };
 
-    });
-
-  }
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:4000/auth/google";
+  };
 
   // ifeeldeadly@gmail.com
 
   // console.log(userDetails, "userDetails");
 
-  if(isLoading) {
-    return <Loader/>
+  if (isLoading) {
+    return <Loader />;
   }
 
   // if(error) {
@@ -97,7 +106,28 @@ const Login = () => {
           Sign in to access your account
         </p>
 
+        <Button
+          onClick={handleGoogleLogin}
+          className="w-full flex items-center justify-center gap-2 border px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          <img
+            src="https://www.svgrepo.com/show/475656/google-color.svg"
+            className="h-5 w-5"
+            alt="Google"
+          />
+          Continue with Google
+        </Button>
+
         <form className="w-full" onSubmit={handleSubmit}>
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-gray-400">or</span>
+            </div>
+          </div>
+
           <label className="block text-sm mb-1">Enter address</label>
           <input
             type="email"
@@ -131,10 +161,13 @@ const Login = () => {
             </button>
           </div>
 
-           <Button type="submit" className="flex items-center justify-center w-full text-xs text-center bg-black text-white p-3 rounded-md mt-4 cursor-pointer">
-              Continue
-            </Button>
-{/* 
+          <Button
+            type="submit"
+            className="flex items-center justify-center w-full text-xs text-center bg-black text-white p-3 rounded-md mt-4 cursor-pointer"
+          >
+            Continue
+          </Button>
+          {/* 
           <button
             type="submit"
             className="w-full bg-black text-white py-2 rounded-md text-sm font-semibold"
