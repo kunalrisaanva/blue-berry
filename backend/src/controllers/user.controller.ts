@@ -1,4 +1,17 @@
 import { Request, Response, NextFunction } from "express";
+
+// Extend Express Request interface to include user with id
+declare global {
+  namespace Express {
+    interface User {
+      id: string | number;
+      [key: string]: any;
+    }
+    interface Request {
+      user?: User;
+    }
+  }
+}
 // import { UserModel, UserDocument } from "../models/user.model";
 import { ApiResponse } from "../utils/ApiResponse";
 import { ApiError } from "../utils/ApiError";
@@ -177,4 +190,69 @@ const verifyOtp = asyncHandler(
 //   // postgress: validate email, password, username
 // };
 
-export { registerUser, loginUser, verifyOtp };
+
+const changeEmail = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  const { email } = req.body;
+  const userId = req.user?.id; // Assuming user ID is stored in req.user
+
+  if (!email) {
+    return next(new ApiError(400, "Email is required"));
+  }
+
+  // Check if the new email already exists
+  const existingUser = await db.query(`SELECT * FROM users WHERE email = $1`, [email]);
+  if (existingUser.rowCount !== null && existingUser.rowCount > 0) {
+    return next(new ApiError(400, "Email already exists"));
+  }
+
+  // Update the user's email
+  const updatedUser = await db.query(
+    `UPDATE users SET email = $1 WHERE id = $2 RETURNING *`,
+    [email, userId]
+  );
+
+  if (updatedUser.rowCount === 0) {
+    return next(new ApiError(500, "Failed to update email"));
+  }
+
+  const response = new ApiResponse(200, updatedUser.rows[0], "Email updated successfully");
+  return res.status(200).json(response);
+});
+
+const changePassword = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user?.id; // Assuming user ID is stored in req.user
+    if ([currentPassword, newPassword].some((field) => field === undefined || field === null || field === "")) {
+      return next(new ApiError(400, "Current password and new password are required"));
+    }
+    if (newPassword.length < 6) {
+      return next(new ApiError(400, "New password must be at least 6 characters long"));
+    }
+    // Check if user exists
+    const user = await db.query(`SELECT * FROM users WHERE id = $1`, [userId]);
+    if (user.rowCount === 0) {
+      return next(new ApiError(404, "User not found"));
+    }
+    const userData = user.rows[0];
+    // Check if current password is correct
+    const isCurrentPasswordValid = comparePassword(currentPassword, userData.password);
+    if (!isCurrentPasswordValid) {
+      return next(new ApiError(401, "Current password is incorrect"));
+    }
+    // Hash the new password  
+    const hashedNewPassword = await hashPassword(newPassword);
+    // Update the user's password
+    const updatedUser = await db.query(
+      `UPDATE users SET password = $1 WHERE id = $2 RETURNING *`,
+      [hashedNewPassword, userId]
+    );
+    if (updatedUser.rowCount === 0) {
+      return next(new ApiError(500, "Failed to update password"));
+    }
+    const response = new ApiResponse(200, updatedUser.rows[0], "Password updated successfully");
+    return res.status(200).json(response);
+  }
+);
+
+export { registerUser, loginUser, verifyOtp , changeEmail, changePassword };
