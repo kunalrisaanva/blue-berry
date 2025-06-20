@@ -20,6 +20,7 @@ import { db } from "../dbConnection/db";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { sendEmail } from "../utils/sendEmail";
+import { hasMXRecord, isEmailFormatValid } from "../utils/emailValidate";
 // import { sendEmail } from "../utils/sendEmail";
 // import  { sendEmail } from "../utils/sendEmail";
 
@@ -57,6 +58,16 @@ const registerUser = asyncHandler(
       );
     }
 
+    // Check if email is valid
+    if (!isEmailFormatValid(email)) {
+      return next(new ApiError(400, "Invalid email format"));
+    }
+
+    // Check if email has MX records
+    if (!(await hasMXRecord(email))) {
+      return next(new ApiError(400, "Email domain is not valid"));
+    }
+
     const hashedPassword = await hashPassword(password);
 
     const existingUser = await db.query(
@@ -74,6 +85,7 @@ const registerUser = asyncHandler(
     // send mail
 
     const response = await sendEmail(email, otp.toString(), "registration");
+    console.log("Email response:", response);
     // Create new user
     const newUser = await db.query(
       `INSERT INTO users (email, password, otp) VALUES ($1, $2, $3) RETURNING *`,
@@ -149,11 +161,17 @@ const loginUser = asyncHandler(
 const verifyOtp = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { email, otp } = req.body;
-    if ([email, otp].some((field) => field === undefined || field === null || field === "")) {
+    if (
+      [email, otp].some(
+        (field) => field === undefined || field === null || field === ""
+      )
+    ) {
       return next(new ApiError(400, "Email and OTP are required"));
     }
     // Check if user exists
-    const user = await db.query(`SELECT * FROM users WHERE email = $1`, [email]);
+    const user = await db.query(`SELECT * FROM users WHERE email = $1`, [
+      email,
+    ]);
     if (user.rowCount === 0) {
       return next(new ApiError(404, "User not found"));
     }
@@ -164,7 +182,11 @@ const verifyOtp = asyncHandler(
     }
 
     // OTP is valid, proceed with user verification
-    const response = new ApiResponse(200, userData, "OTP verified successfully");
+    const response = new ApiResponse(
+      200,
+      userData,
+      "OTP verified successfully"
+    );
     return res.status(200).json(response);
   }
 );
@@ -190,44 +212,60 @@ const verifyOtp = asyncHandler(
 //   // postgress: validate email, password, username
 // };
 
+const changeEmail = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email } = req.body;
+    const userId = req.user?.id; // Assuming user ID is stored in req.user
 
-const changeEmail = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-  const { email } = req.body;
-  const userId = req.user?.id; // Assuming user ID is stored in req.user
+    if (!email) {
+      return next(new ApiError(400, "Email is required"));
+    }
 
-  if (!email) {
-    return next(new ApiError(400, "Email is required"));
+    // Check if the new email already exists
+    const existingUser = await db.query(
+      `SELECT * FROM users WHERE email = $1`,
+      [email]
+    );
+    if (existingUser.rowCount !== null && existingUser.rowCount > 0) {
+      return next(new ApiError(400, "Email already exists"));
+    }
+
+    // Update the user's email
+    const updatedUser = await db.query(
+      `UPDATE users SET email = $1 WHERE id = $2 RETURNING *`,
+      [email, userId]
+    );
+
+    if (updatedUser.rowCount === 0) {
+      return next(new ApiError(500, "Failed to update email"));
+    }
+
+    const response = new ApiResponse(
+      200,
+      updatedUser.rows[0],
+      "Email updated successfully"
+    );
+    return res.status(200).json(response);
   }
-
-  // Check if the new email already exists
-  const existingUser = await db.query(`SELECT * FROM users WHERE email = $1`, [email]);
-  if (existingUser.rowCount !== null && existingUser.rowCount > 0) {
-    return next(new ApiError(400, "Email already exists"));
-  }
-
-  // Update the user's email
-  const updatedUser = await db.query(
-    `UPDATE users SET email = $1 WHERE id = $2 RETURNING *`,
-    [email, userId]
-  );
-
-  if (updatedUser.rowCount === 0) {
-    return next(new ApiError(500, "Failed to update email"));
-  }
-
-  const response = new ApiResponse(200, updatedUser.rows[0], "Email updated successfully");
-  return res.status(200).json(response);
-});
+);
 
 const changePassword = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { currentPassword, newPassword } = req.body;
     const userId = req.user?.id; // Assuming user ID is stored in req.user
-    if ([currentPassword, newPassword].some((field) => field === undefined || field === null || field === "")) {
-      return next(new ApiError(400, "Current password and new password are required"));
+    if (
+      [currentPassword, newPassword].some(
+        (field) => field === undefined || field === null || field === ""
+      )
+    ) {
+      return next(
+        new ApiError(400, "Current password and new password are required")
+      );
     }
     if (newPassword.length < 6) {
-      return next(new ApiError(400, "New password must be at least 6 characters long"));
+      return next(
+        new ApiError(400, "New password must be at least 6 characters long")
+      );
     }
     // Check if user exists
     const user = await db.query(`SELECT * FROM users WHERE id = $1`, [userId]);
@@ -236,11 +274,14 @@ const changePassword = asyncHandler(
     }
     const userData = user.rows[0];
     // Check if current password is correct
-    const isCurrentPasswordValid = comparePassword(currentPassword, userData.password);
+    const isCurrentPasswordValid = comparePassword(
+      currentPassword,
+      userData.password
+    );
     if (!isCurrentPasswordValid) {
       return next(new ApiError(401, "Current password is incorrect"));
     }
-    // Hash the new password  
+    // Hash the new password
     const hashedNewPassword = await hashPassword(newPassword);
     // Update the user's password
     const updatedUser = await db.query(
@@ -250,9 +291,13 @@ const changePassword = asyncHandler(
     if (updatedUser.rowCount === 0) {
       return next(new ApiError(500, "Failed to update password"));
     }
-    const response = new ApiResponse(200, updatedUser.rows[0], "Password updated successfully");
+    const response = new ApiResponse(
+      200,
+      updatedUser.rows[0],
+      "Password updated successfully"
+    );
     return res.status(200).json(response);
   }
 );
 
-export { registerUser, loginUser, verifyOtp , changeEmail, changePassword };
+export { registerUser, loginUser, verifyOtp, changeEmail, changePassword };
