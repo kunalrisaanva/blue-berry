@@ -48,7 +48,7 @@ function Main({}: Props) {
   }
 
   return (
-    <div className="w-full  mt-20 md:mt-2 p-2 ">
+    <div className="w-full  mt-24 md:mt-2 p-2 ">
       <Slider />
 
       <div className="my-6 ">

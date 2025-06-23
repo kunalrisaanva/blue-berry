@@ -97,9 +97,9 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-white px-4">
+    <div className="min-h-screen flex justify-center items-start  md:items-center bg-white px-4">
       <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-6">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between  items-center rounded-full  mb-6">
           <button onClick={handleBack} className="text-gray-500">
             ←
           </button>
@@ -112,7 +112,7 @@ const Signup = () => {
         </div>
 
         <h2 className="text-2xl font-semibold text-center mb-1">
-          Create an Account
+          Welcome Back
         </h2>
         <p className="text-center text-gray-500 text-sm mb-6">
           Join ShopTech for the best shopping experience
@@ -194,7 +194,10 @@ const Signup = () => {
                   key={index}
                   type="text"
                   maxLength={1}
-                  ref={(el) => { inputsRef.current[index] = el; }}
+                  value={digit}
+                  ref={(el) => {
+                    inputsRef.current[index] = el;
+                  }}
                   onChange={(e) => handleOtpChange(e.target.value, index)}
                   className="w-10 h-12 text-center text-lg border rounded-md focus:outline-none"
                 />

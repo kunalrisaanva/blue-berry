@@ -11,9 +11,8 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
     "profile"
   );
 
- const user = useSelector((state: any) => state.auth.user);
-console.log("User details:", user);
-
+  const user = useSelector((state: any) => state.auth.user);
+  console.log("User details:", user);
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
@@ -58,7 +57,7 @@ console.log("User details:", user);
           </ul>
           <div className="mt-8 md:absolute bottom-4 left-6 text-xs text-gray-400">
             Secured by{" "}
-            <span className="font-semibold text-gray-600">Clerk</span>
+            <span className="font-semibold text-gray-600">Future Nodes</span>
             <br />
             <span className="text-orange-500 font-medium">
               Development mode

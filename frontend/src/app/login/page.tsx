@@ -57,10 +57,6 @@ const Login = () => {
       });
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:4000/auth/google";
-  };
-
   // ifeeldeadly@gmail.com
 
   // console.log(userDetails, "userDetails");
@@ -84,7 +80,7 @@ const Login = () => {
   //   }
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-white px-4">
+    <div className="min-h-screen flex justify-center items-start md:items-center bg-white px-4">
       <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-6">
         {/* Top header */}
         <div className="flex justify-between items-center mb-6">
@@ -106,17 +102,17 @@ const Login = () => {
           Sign in to access your account
         </p>
 
-        <Button
+        {/* <Button
           onClick={handleGoogleLogin}
           className="w-full flex items-center justify-center gap-2 border px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-        >
-          <img
+        > */}
+        {/* <img
             src="https://www.svgrepo.com/show/475656/google-color.svg"
             className="h-5 w-5"
             alt="Google"
           />
-          Continue with Google
-        </Button>
+          Continue with Google */}
+        {/* </Button> */}
 
         <form className="w-full" onSubmit={handleSubmit}>
           <div className="relative my-4">

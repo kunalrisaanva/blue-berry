@@ -61,14 +61,14 @@ const Slider: React.FC = () => {
             className="min-w-full flex flex-col md:flex-row items-center justify-between"
           >
             {/* Text Content */}
-            <div className="md:w-1/2 p-6 px-20 space-y-6">
+            <div className="md:w-1/2   p-4 md:px-20  flex flex-col justify-self-auto items-start gap-4 ">
               <span className="text-xs font-semibold text-blue-500 bg-gray-100 px-2 py-1 rounded">
                 {slide.subtitle}
               </span>
-              <h2 className="text-4xl pt-4 font-bold text-gray-900">
+              <h2 className=" text-2xl md:text-4xl  pt-4 font-bold text-gray-900">
                 {slide.title}
               </h2>
-              <p className="text-gray-600">{slide.description}</p>
+              <p className="text-gray-600 text-xl">{slide.description}</p>
               <p className="text-gray-800">
                 Use code: <span className="font-bold">{slide.code}</span> for{" "}
                 <span className="font-bold">{slide.discount}</span> OFF
