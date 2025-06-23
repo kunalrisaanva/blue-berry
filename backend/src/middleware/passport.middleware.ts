@@ -12,7 +12,6 @@ passport.use(
     new JwtStrategy(options, async (jwt_payload, done) => {
       try {
         const result = await db.query("SELECT * FROM users WHERE id = $1", [jwt_payload.id]);
-  
         if (result.rowCount !== null && result.rowCount > 0) {
           return done(null, result.rows[0]);
         } else {

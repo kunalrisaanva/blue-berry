@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { registerUser , loginUser, verifyOtp , changeEmail , changePassword } from "../controllers/user.controller";
-import { requestPasswordReset , resetPassword} from "../controllers/resetPassword.controller";
+import { registerUser , loginUser, verifyOtp , changeEmail , changePassword, resetPasswordMail, resetPassword } from "../controllers/user.controller";
+// import { requestPasswordReset } from "../controllers/resetPassword.controller";
 
-import  passport from "../middleware/passport.middleware"
+import passport from "../middleware/passport.middleware"
 const router = Router();
 
 
@@ -12,7 +12,7 @@ router.route("/verify-otp").post(verifyOtp)
 router.route("/login").post(loginUser);
 
 // Reset password routes
-router.route("/request-password-reset").post(requestPasswordReset);
+router.route("/request-password-reset").post(resetPasswordMail);
 router.route("/reset-password").post(resetPassword);
 
 
@@ -26,8 +26,9 @@ router.get(
     }
 );
 
-router.route("/change-email").post(changeEmail);
+router.route("/change-email").post(changeEmail); 
 router.route("/change-password").post(changePassword);
+
 
 
 

@@ -2,7 +2,7 @@ import express, { Request, Response, Errback, NextFunction } from "express";
 import passport from "./middleware/passport.middleware";
 import cors from "cors"
 import morgan from "morgan";
-
+import session from "express-session";
 
 const app = express();
 app.use(express.json());
@@ -10,6 +10,14 @@ app.use(express.urlencoded({ extended: true }));
 
 // passport middleware
 app.use(passport.initialize());
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET as string,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
 
 // cors middleware
@@ -30,9 +38,11 @@ app.get("/", (req: Request, res: Response) => {
 // Import routes
 import { userRoutes } from "./routes/user.routes";
 import { productRoutes } from "./routes/product.routes";
+import googleRoutes from './routes/google.routes';
 
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/products", productRoutes);
+app.use('/auth', googleRoutes);
 
 // General error handling middleware , should be last
 app.use((err: any, req: Request, res: Response, next: NextFunction): void => {

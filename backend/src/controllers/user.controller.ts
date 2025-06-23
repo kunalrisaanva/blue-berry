@@ -82,18 +82,19 @@ const registerUser = asyncHandler(
 
     // create otp
     const otp = generateNumericOTP();
-    // send mail
 
-    const response = await sendEmail(email, otp.toString(), "registration");
-    console.log("Email response:", response);
-    // Create new user
     const newUser = await db.query(
       `INSERT INTO users (email, password, otp) VALUES ($1, $2, $3) RETURNING *`,
       [email, hashedPassword, otp]
     );
 
-    if (response.success === true) {
-      if (newUser && newUser.rowCount !== null && newUser.rowCount > 0) {
+    // send mail
+    const response = await sendEmail(email, otp.toString(), "registration");
+    console.log("Email response:", response);
+    // Create new user
+
+    if (newUser && newUser.rowCount !== null && newUser.rowCount > 0) {
+      if (response.success === true) {
         const user = newUser.rows[0];
         const response = new ApiResponse(
           201,
@@ -102,10 +103,12 @@ const registerUser = asyncHandler(
         );
         return res.status(201).json(response);
       } else {
-        return next(new ApiError(500, "User creation failed"));
+        return next(
+          new ApiError(500, "something went wrong while sending OTP.")
+        );
       }
     } else {
-      return next(new ApiError(500, "something went wrong while sending OTP."));
+      return next(new ApiError(500, "User creation failed"));
     }
   }
 );
@@ -130,8 +133,12 @@ const loginUser = asyncHandler(
     const user = await db.query(`SELECT * FROM users WHERE email = $1`, [
       email,
     ]);
+
+    if (!user)
+      return next(new ApiError(500, "Failed to fetch user from database"));
+
     if (user.rowCount === 0) {
-      return next(new ApiError(401, "Invalid email or password"));
+      return next(new ApiError(404, "User does not exist"));
     }
     const userData = user.rows[0];
 
@@ -300,4 +307,112 @@ const changePassword = asyncHandler(
   }
 );
 
-export { registerUser, loginUser, verifyOtp, changeEmail, changePassword };
+const resetPasswordMail = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email } = req.body;
+
+    if (!email) {
+      return next(new ApiError(400, "Email and new password are required"));
+    }
+
+    // Check if user exists
+    const user = await db.query(`SELECT * FROM users WHERE email = $1`, [
+      email,
+    ]);
+    if (user.rowCount === 0) {
+      return next(new ApiError(404, "User not found"));
+    }
+    const userData = user.rows[0];
+
+    // token genrating jwt
+    const token = jwt.sign(
+      { id: userData.id, email: userData.email },
+      process.env.JWT_SECRET || "your_jwt_secret",
+      { expiresIn: "1h" }
+    );
+
+    // send mail using nodemailer
+    const emailResponse = await sendEmail(email, token, "reset");
+
+    if (!emailResponse) {
+      return next(new ApiError(500, "Failed to send password reset email"));
+    }
+
+    const response = new ApiResponse(
+      200,
+      // updatedUser.rows[0],
+      "Password reset mail sent successfully. Please check your email."
+    );
+    return res.status(200).json(response);
+  }
+);
+
+const resetPassword = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { newPassword } = req.body;
+    const token = req.query.token || req.body.token || req.cookies.token;
+
+    if (!token || typeof token !== "string" || !newPassword) {
+      return next(new ApiError(400, "Token and new password are required"));
+    }
+
+    // Validate new password for security requirements
+    if (newPassword.length < 6) {
+      return next(
+        new ApiError(400, "New password must be at least 6 characters long")
+      );
+    }
+
+    // Verify the token
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(
+        token,
+        process.env.JWT_SECRET || "your_jwt_secret"
+      );
+    } catch (error) {
+      return next(new ApiError(400, "Invalid or expired token"));
+    }
+
+    let userId;
+    if (
+      typeof decodedToken === "object" &&
+      decodedToken !== null &&
+      "id" in decodedToken
+    ) {
+      userId = (decodedToken as jwt.JwtPayload).id;
+    } else {
+      return next(new ApiError(400, "Invalid token payload"));
+    }
+
+    // Hash the new password
+    const hashedNewPassword = await hashPassword(newPassword);
+
+    // Update the user's password
+    const updatedUser = await db.query(
+      `UPDATE users SET password = $1 WHERE id = $2 RETURNING *`,
+      [hashedNewPassword, userId]
+    );
+
+    if (updatedUser.rowCount === 0) {
+      return next(new ApiError(500, "Failed to update password"));
+    }
+
+    const response = new ApiResponse(
+      200,
+      updatedUser.rows[0],
+      "Password reset successfully"
+    );
+    return res.status(200).json(response);
+  }
+);
+
+export {
+  registerUser,
+  loginUser,
+  verifyOtp,
+  changeEmail,
+  changePassword,
+  resetPasswordMail,
+  resetPassword,
+};
