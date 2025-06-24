@@ -29,6 +29,15 @@ const Login = () => {
       return;
     }
 
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long.");
+      return;
+    }
+
     axios
       .post(`${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/login`, {
         email,
@@ -52,8 +61,9 @@ const Login = () => {
           setIsLoading(false);
         }
       })
-      .catch((e) => {
+      .catch((e:any) => {
         setIsLoading(false);
+        toast.error(e.response?.data?.message || "Login failed.");
         console.log("ERROR-", e);
       })
       .finally(() => {
