@@ -24,12 +24,12 @@ import { hasMXRecord, isEmailFormatValid } from "../utils/emailValidate";
 // import { sendEmail } from "../utils/sendEmail";
 // import  { sendEmail } from "../utils/sendEmail";
 
-function generateNumericOTP(length: number = 4): number {
+function generateNumericOTP(length: number = 4): string {
   let otp = "";
   for (let i = 0; i < length; i++) {
     otp += Math.floor(Math.random() * 10).toString();
   }
-  return parseInt(otp, 10);
+  return otp;
 }
 
 async function hashPassword(password: string): Promise<string> {
@@ -43,73 +43,113 @@ function comparePassword(password: string, hashedPassword: string): boolean {
 
 const registerUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { email, password } = req.body;
+  //   const { email, password } = req.body;
 
-    if (
-      [email, password].some(
-        (field) => field === undefined || field === null || field === ""
-      )
-    ) {
-      return next(new ApiError(400, "All fields are required"));
-    }
-    if (password.length < 6) {
-      return next(
-        new ApiError(400, "Password must be at least 6 characters long")
+  //   if (
+  //     [email, password].some(
+  //       (field) => field === undefined || field === null || field === ""
+  //     )
+  //   ) {
+  //     return next(new ApiError(400, "All fields are required"));
+  //   }
+  //   if (password.length < 6) {
+  //     return next(
+  //       new ApiError(400, "Password must be at least 6 characters long")
+  //     );
+  //   }
+
+  //   // Check if email is valid
+  //   if (!isEmailFormatValid(email)) {
+  //     return next(new ApiError(400, "Invalid email format"));
+  //   }
+
+  //   // Check if email has MX records
+  //   if (!(await hasMXRecord(email))) {
+  //     return next(new ApiError(400, "Email domain is not valid"));
+  //   }
+
+  //   const existingUser = await db.query(
+  //     `SELECT * FROM users WHERE email = $1`,
+  //     [email]
+  //   );
+
+  //   // Check if user already exists
+  //   if (existingUser.rowCount !== null && existingUser.rowCount > 0) {
+  //     throw next(new ApiError(400, "User already exists"));
+  //   }
+
+  //   // create otp
+
+    
+  //   const otp = generateNumericOTP();
+
+  //   const newUser = await db.query(
+  //     `INSERT INTO users (otp) VALUES ($1) RETURNING *`,
+  //     [otp]
+  //   );
+
+  //   // send mail
+  //   const response = await sendEmail(email, otp.toString(), "registration");
+  //   // console.log("Email response:", response);
+
+  //   if (newUser && newUser.rowCount !== null && newUser.rowCount > 0) {
+  //     if (response.success === true) {
+  //       // const user = newUser.rows[0];
+  //       const response = new ApiResponse(
+  //         201,
+  //         {},
+  //         "OTP Sent successfully"
+  //       );
+  //       return res.status(201).json(response);
+  //     } else {
+  //       return next(
+  //         new ApiError(500, "something went wrong while sending OTP.")
+  //       );
+  //     }
+  //   } else {
+  //     return next(new ApiError(500, "User creation failed"));
+  //   }
+
+
+  const { email } = req.body;
+
+    if (!email) return next(new ApiError(400, "Email is required"));
+    if (!isEmailFormatValid(email)) return next(new ApiError(400, "Invalid email format"));
+    if (!(await hasMXRecord(email))) return next(new ApiError(400, "Invalid email domain"));
+
+    const existing = await db.query(`SELECT * FROM users WHERE email = $1`, [email]);
+
+    const otp = generateNumericOTP();
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+
+    if (existing.rowCount !== null && existing.rowCount > 0) {
+      const user = existing.rows[0];
+
+      if (user.is_verified) {
+        return next(new ApiError(400, "User already registered"));
+      }
+
+      // Update OTP & reset attempts
+      await db.query(
+        `UPDATE users SET otp = $1, otp_expires_at = $2, otp_attempts = 0 WHERE email = $3`,
+        [otp, otpExpiry, email]
+      );
+    } else {
+      await db.query(
+        `INSERT INTO users (email, otp, otp_expires_at, otp_attempts) VALUES ($1, $2, $3, 0)`,
+        [email, otp, otpExpiry]
       );
     }
 
-    // Check if email is valid
-    if (!isEmailFormatValid(email)) {
-      return next(new ApiError(400, "Invalid email format"));
+    const response = await sendEmail(email, otp, "registration");
+
+    if (!response.success) {
+      return next(new ApiError(500, "Failed to send OTP"));
     }
 
-    // Check if email has MX records
-    if (!(await hasMXRecord(email))) {
-      return next(new ApiError(400, "Email domain is not valid"));
-    }
-
-    const hashedPassword = await hashPassword(password);
-
-    const existingUser = await db.query(
-      `SELECT * FROM users WHERE email = $1`,
-      [email]
-    );
-
-    // Check if user already exists
-    if (existingUser.rowCount !== null && existingUser.rowCount > 0) {
-      throw next(new ApiError(400, "User already exists"));
-    }
-
-    // create otp
-    const otp = generateNumericOTP();
-
-    const newUser = await db.query(
-      `INSERT INTO users (email, password, otp) VALUES ($1, $2, $3) RETURNING *`,
-      [email, hashedPassword, otp]
-    );
-
-    // send mail
-    const response = await sendEmail(email, otp.toString(), "registration");
-    console.log("Email response:", response);
-    // Create new user
-
-    if (newUser && newUser.rowCount !== null && newUser.rowCount > 0) {
-      if (response.success === true) {
-        const user = newUser.rows[0];
-        const response = new ApiResponse(
-          201,
-          user,
-          "User created successfully"
-        );
-        return res.status(201).json(response);
-      } else {
-        return next(
-          new ApiError(500, "something went wrong while sending OTP.")
-        );
-      }
-    } else {
-      return next(new ApiError(500, "User creation failed"));
-    }
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "OTP sent to your email"));
   }
 );
 
@@ -167,34 +207,92 @@ const loginUser = asyncHandler(
 
 const verifyOtp = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { email, otp } = req.body;
-    if (
-      [email, otp].some(
-        (field) => field === undefined || field === null || field === ""
-      )
-    ) {
-      return next(new ApiError(400, "Email and OTP are required"));
+
+     const { email, password, otp } = req.body;
+
+    if ([email, password, otp].some(field => !field || field.trim() === "")) {
+      return next(new ApiError(400, "Email, password and OTP are required"));
     }
-    // Check if user exists
-    const user = await db.query(`SELECT * FROM users WHERE email = $1`, [
-      email,
-    ]);
-    if (user.rowCount === 0) {
+
+    const result = await db.query(`SELECT * FROM users WHERE email = $1`, [email]);
+
+    if (result.rowCount === 0) {
       return next(new ApiError(404, "User not found"));
     }
-    const userData = user.rows[0];
-    // Check if OTP matches
-    if (userData.otp !== otp) {
+
+    const user = result.rows[0];
+
+    if (user.is_verified) {
+      return next(new ApiError(400, "User is already verified"));
+    }
+
+    // Check OTP expiry
+    if (!user.otp_expires_at || new Date(user.otp_expires_at) < new Date()) {
+      return next(new ApiError(401, "OTP has expired. Please request a new one."));
+    }
+
+    // Check attempts
+    if (user.otp_attempts >= 5) {
+      return next(new ApiError(429, "Too many invalid attempts. Please request a new OTP."));
+    }
+
+    // Check OTP match
+    if (user.otp !== otp) {
+      await db.query(
+        `UPDATE users SET otp_attempts = otp_attempts + 1 WHERE email = $1`,
+        [email]
+      );
       return next(new ApiError(401, "Invalid OTP"));
     }
 
-    // OTP is valid, proceed with user verification
-    const response = new ApiResponse(
-      200,
-      userData,
-      "OTP verified successfully"
+    // OTP is valid → proceed
+    const hashed = await hashPassword(password);
+    await db.query(
+      `UPDATE users SET password = $1, is_verified = TRUE, otp = NULL, otp_expires_at = NULL, otp_attempts = 0 WHERE email = $2`,
+      [hashed, email]
     );
-    return res.status(200).json(response);
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "User registered successfully"));
+
+
+    // const { email, password, otp } = req.body;
+    // if (
+    //   [email, password, otp].some(
+    //     (field) => field === undefined || field === null || field === ""
+    //   )
+    // ) {
+    //   return next(new ApiError(400, "Email, password, and OTP are required"));
+    // }
+    // // Check if user exists
+    // const user = await db.query(`SELECT * FROM users WHERE email = $1`, [
+    //   email,
+    // ]);
+    // if (user.rowCount === 0) {
+    //   return next(new ApiError(404, "User not found"));
+    // }
+
+    // // hash password
+    // const hashedPassword = await hashPassword(password);
+    // const userData = user.rows[0];
+    // // Check if OTP matches
+    // if (userData.otp !== otp) {
+    //   return next(new ApiError(401, "Invalid OTP"));
+    // }
+
+    // const newUser = await db.query(
+    //   `INSERT INTO users (email, password, otp) VALUES ($1, $2, $3) RETURNING *`,
+    //   [email, hashedPassword, otp]
+    // );
+
+    // // OTP is valid, proceed with user verification
+    // const response = new ApiResponse(
+    //   200,
+    //   userData,
+    //   "OTP verified successfully"
+    // );
+    // return res.status(200).json(response);
   }
 );
 
