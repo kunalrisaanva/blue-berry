@@ -9,7 +9,8 @@ import Button from "../components/ui/Button";
 
 const Signup = () => {
   const router = useRouter();
-  const [formData, setFormData] = React.useState({ email: "", password: "" });
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   // const [step, setStep] = React.useState("otp");
   const [step, setStep] = React.useState<"signup" | "otp">("signup");
@@ -19,6 +20,7 @@ const Signup = () => {
 
   interface RegisterResponse {
     success: boolean;
+    statusCode: number;
     message?: string;
     data: {
       otp: string;
@@ -37,22 +39,31 @@ const Signup = () => {
     }
   }, [step]);
 
+  console.log("email value ----->",email);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+
+    
     e.preventDefault();
-    if (!formData.email || !formData.password) {
+    if (!email || !password) {
       toast.error("Please fill in all fields.");
       return;
     }
-
+    
     try {
       const response = await axios.post<RegisterResponse>(
         `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/register`,
-        formData
+        {email}
       );
 
-      const receivedOtp = response.data.data.otp;
-      setOtp(receivedOtp.split("")); // Convert OTP string to array
-      setStep("otp");
+      console.log("Response from registration API:", response.data);
+      if(response.data.statusCode === 200) {
+        toast.success("Registration successful! Please check your email for the OTP.");
+        setStep("otp");
+        setOtp(["", "", "", ""]); // Reset OTP inputs
+      } else {
+        toast.error("Registration failed.");
+      }
     } catch (err) {
       toast.error("Registration failed.");
       console.error(err);
@@ -62,7 +73,7 @@ const Signup = () => {
   const handlerVerifyOtp = async () => {
     const verifyResponse = await axios.post(
       `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/verify-otp`,
-      { email: formData.email, otp: otp.join("") }
+      { email: email, password: password, otp: otp.join("") }
     );
 
     // console.log(verifyResponse);
@@ -88,7 +99,7 @@ const Signup = () => {
   const handleResend = () => {
     setOtp(["", "", "", ""]);
     setResendCount(resendCount + 1);
-    alert("OTP resent to " + formData.email);
+    alert("OTP resent to " + email);
   };
 
   const handleBack = () => {
@@ -141,10 +152,8 @@ const Signup = () => {
             <label className="block text-sm mb-1">Enter address</label>
             <input
               type="email"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 border rounded-md mb-4"
               placeholder="Enter your email address"
               required
@@ -154,10 +163,8 @@ const Signup = () => {
             <div className="relative mb-4">
               <input
                 type={showPassword ? "text" : "password"}
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-3 py-2 border rounded-md"
                 placeholder="Enter your password"
                 required

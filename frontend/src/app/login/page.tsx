@@ -24,7 +24,10 @@ const Login = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Handle login logic here
-    console.log("Email:", email);
+    if (!email || !password) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
 
     axios
       .post(`${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/login`, {
@@ -36,6 +39,8 @@ const Login = () => {
           setIsLoading(true);
           // console.log("response from login api ===> ",response.data.data);
           dispatch(loginSuccess(response.data.data));
+
+          // localStorage.setItem("token") // to do set token in local storage coming fron api 
           // console.log("Login successful:", response.data.data.safeUserData);
           setIsLoading(false);
           router.push("/"); // Redirect to home page after successful login
@@ -58,7 +63,7 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:4000/auth/google";
+    window.location.href = '/api/auth/google';
   };
 
   // ifeeldeadly@gmail.com
@@ -106,77 +111,77 @@ const Login = () => {
           Sign in to access your account
         </p>
 
-<form onSubmit={handleSubmit}>
-  <Button
-    onClick={handleGoogleLogin}
-    type="button"
-    className="w-full flex items-center justify-center gap-2 border px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-  >
-    <img
-      src="https://www.svgrepo.com/show/475656/google-color.svg"
-      className="h-5 w-5"
-      alt="Google"
-    />
-    Continue with Google
-  </Button>
-  <div className="relative flex justify-center text-xs uppercase my-4">
-    <span className="bg-white px-2 text-gray-400">or</span>
-  </div>
+        <form onSubmit={handleSubmit}>
+          <Button
+            onClick={handleGoogleLogin}
+            type="button"
+            className="w-full flex items-center justify-center gap-2 border px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            <img
+              src="https://www.svgrepo.com/show/475656/google-color.svg"
+              className="h-5 w-5"
+              alt="Google"
+            />
+            Continue with Google
+          </Button>
+          <div className="relative flex justify-center text-xs uppercase my-4">
+            <span className="bg-white px-2 text-gray-400">or</span>
+          </div>
 
-  <label className="block text-sm mb-1">Enter address</label>
-  <input
-    type="email"
-    value={email}
-    onChange={(e) => setEmail(e.target.value)}
-    className="w-full px-3 py-2 border rounded-md mb-4"
-    placeholder="Enter your email address"
-    required
-  />
+          <label className="block text-sm mb-1">Enter address</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-3 py-2 border rounded-md mb-4"
+            placeholder="Enter your email address"
+            required
+          />
 
-  <label className="block text-sm mb-1">Enter password</label>
-  <div className="relative mb-4">
-    <input
-      type={showPassword ? "text" : "password"}
-      value={password}
-      onChange={(e) => setPassword(e.target.value)}
-      className="w-full px-3 py-2 border rounded-md"
-      placeholder="Enter your password"
-      required
-    />
-    <button
-      type="button"
-      onClick={() => setShowPassword((prev) => !prev)}
-      className="absolute inset-y-0 right-0 px-3 flex items-center text-sm text-gray-600"
-    >
-      {showPassword ? (
-        <AiOutlineEyeInvisible size={20} />
-      ) : (
-        <AiOutlineEye size={20} />
-      )}
-    </button>
-  </div>
+          <label className="block text-sm mb-1">Enter password</label>
+          <div className="relative mb-4">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2 border rounded-md"
+              placeholder="Enter your password"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute inset-y-0 right-0 px-3 flex items-center text-sm text-gray-600"
+            >
+              {showPassword ? (
+                <AiOutlineEyeInvisible size={20} />
+              ) : (
+                <AiOutlineEye size={20} />
+              )}
+            </button>
+          </div>
 
-  <Button
-    type="submit"
-    className="flex items-center justify-center w-full text-xs text-center bg-black text-white p-3 rounded-md mt-4 cursor-pointer"
-  >
-    Continue
-  </Button>
-  {/* 
+          <Button
+            type="submit"
+            className="flex items-center justify-center w-full text-xs text-center bg-black text-white p-3 rounded-md mt-4 cursor-pointer"
+          >
+            Continue
+          </Button>
+          {/* 
   <button
     type="submit"
     className="w-full bg-black text-white py-2 rounded-md text-sm font-semibold"
   >
     Continue
   </button> */}
-</form>
+        </form>
 
-<p className="text-sm text-gray-500 text-center mt-6">
-  Don’t have an account?{" "}
-  <Link href="/signup" className="text-blue-600 hover:underline">
-    Sign up
-  </Link>
-</p>
+        <p className="text-sm text-gray-500 text-center mt-6">
+          Don’t have an account?{" "}
+          <Link href="/signup" className="text-blue-600 hover:underline">
+            Sign up
+          </Link>
+        </p>
       </div>
     </div>
   );
