@@ -15,7 +15,7 @@ router.route("/all-prodcuts").get(allProducts);
 router.get("/product", getSingleProductById);
 
 // protected routes
-router.use(passport.authenticate("jwt", { session: false }));
+// router.use(passport.authenticate("jwt", { session: false }));
 router.post("/add-product", upload.single("image"), addProduct);
 
 
