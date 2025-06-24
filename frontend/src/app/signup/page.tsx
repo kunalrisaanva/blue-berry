@@ -71,10 +71,16 @@ const Signup = () => {
   };
 
   const handlerVerifyOtp = async () => {
-    const verifyResponse = await axios.post(
-      `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/verify-otp`,
-      { email: email, password: password, otp: otp.join("") }
-    );
+    let verifyResponse;
+    try {
+      verifyResponse = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/verify-otp`,
+        { email: email, password: password, otp: otp.join("") }
+      );
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "OTP verification failed.");
+      return;
+    }
 
     // console.log(verifyResponse);
 
