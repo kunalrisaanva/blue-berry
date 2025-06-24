@@ -18,7 +18,7 @@ import { ApiError } from "../utils/ApiError";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { db } from "../dbConnection/db";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { sendEmail } from "../utils/sendEmail";
 import { hasMXRecord, isEmailFormatValid } from "../utils/emailValidate";
 // import { sendEmail } from "../utils/sendEmail";
@@ -37,87 +37,95 @@ async function hashPassword(password: string): Promise<string> {
   return bcrypt.hashSync(password, salt);
 }
 
-function comparePassword(password: string, hashedPassword: string): boolean {
-  return bcrypt.compareSync(password, hashedPassword);
+async function comparePassword(
+  password: string,
+  hashedPassword: string
+): Promise<boolean> {
+  if (!password || !hashedPassword) {
+    throw new Error("data and hash arguments required");
+  }
+  return await bcrypt.compare(password, hashedPassword);
 }
 
 const registerUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-  //   const { email, password } = req.body;
+    //   const { email, password } = req.body;
 
-  //   if (
-  //     [email, password].some(
-  //       (field) => field === undefined || field === null || field === ""
-  //     )
-  //   ) {
-  //     return next(new ApiError(400, "All fields are required"));
-  //   }
-  //   if (password.length < 6) {
-  //     return next(
-  //       new ApiError(400, "Password must be at least 6 characters long")
-  //     );
-  //   }
+    //   if (
+    //     [email, password].some(
+    //       (field) => field === undefined || field === null || field === ""
+    //     )
+    //   ) {
+    //     return next(new ApiError(400, "All fields are required"));
+    //   }
+    //   if (password.length < 6) {
+    //     return next(
+    //       new ApiError(400, "Password must be at least 6 characters long")
+    //     );
+    //   }
 
-  //   // Check if email is valid
-  //   if (!isEmailFormatValid(email)) {
-  //     return next(new ApiError(400, "Invalid email format"));
-  //   }
+    //   // Check if email is valid
+    //   if (!isEmailFormatValid(email)) {
+    //     return next(new ApiError(400, "Invalid email format"));
+    //   }
 
-  //   // Check if email has MX records
-  //   if (!(await hasMXRecord(email))) {
-  //     return next(new ApiError(400, "Email domain is not valid"));
-  //   }
+    //   // Check if email has MX records
+    //   if (!(await hasMXRecord(email))) {
+    //     return next(new ApiError(400, "Email domain is not valid"));
+    //   }
 
-  //   const existingUser = await db.query(
-  //     `SELECT * FROM users WHERE email = $1`,
-  //     [email]
-  //   );
+    //   const existingUser = await db.query(
+    //     `SELECT * FROM users WHERE email = $1`,
+    //     [email]
+    //   );
 
-  //   // Check if user already exists
-  //   if (existingUser.rowCount !== null && existingUser.rowCount > 0) {
-  //     throw next(new ApiError(400, "User already exists"));
-  //   }
+    //   // Check if user already exists
+    //   if (existingUser.rowCount !== null && existingUser.rowCount > 0) {
+    //     throw next(new ApiError(400, "User already exists"));
+    //   }
 
-  //   // create otp
+    //   // create otp
 
-    
-  //   const otp = generateNumericOTP();
+    //   const otp = generateNumericOTP();
 
-  //   const newUser = await db.query(
-  //     `INSERT INTO users (otp) VALUES ($1) RETURNING *`,
-  //     [otp]
-  //   );
+    //   const newUser = await db.query(
+    //     `INSERT INTO users (otp) VALUES ($1) RETURNING *`,
+    //     [otp]
+    //   );
 
-  //   // send mail
-  //   const response = await sendEmail(email, otp.toString(), "registration");
-  //   // console.log("Email response:", response);
+    //   // send mail
+    //   const response = await sendEmail(email, otp.toString(), "registration");
+    //   // console.log("Email response:", response);
 
-  //   if (newUser && newUser.rowCount !== null && newUser.rowCount > 0) {
-  //     if (response.success === true) {
-  //       // const user = newUser.rows[0];
-  //       const response = new ApiResponse(
-  //         201,
-  //         {},
-  //         "OTP Sent successfully"
-  //       );
-  //       return res.status(201).json(response);
-  //     } else {
-  //       return next(
-  //         new ApiError(500, "something went wrong while sending OTP.")
-  //       );
-  //     }
-  //   } else {
-  //     return next(new ApiError(500, "User creation failed"));
-  //   }
+    //   if (newUser && newUser.rowCount !== null && newUser.rowCount > 0) {
+    //     if (response.success === true) {
+    //       // const user = newUser.rows[0];
+    //       const response = new ApiResponse(
+    //         201,
+    //         {},
+    //         "OTP Sent successfully"
+    //       );
+    //       return res.status(201).json(response);
+    //     } else {
+    //       return next(
+    //         new ApiError(500, "something went wrong while sending OTP.")
+    //       );
+    //     }
+    //   } else {
+    //     return next(new ApiError(500, "User creation failed"));
+    //   }
 
-
-  const { email } = req.body;
+    const { email } = req.body;
 
     if (!email) return next(new ApiError(400, "Email is required"));
-    if (!isEmailFormatValid(email)) return next(new ApiError(400, "Invalid email format"));
-    if (!(await hasMXRecord(email))) return next(new ApiError(400, "Invalid email domain"));
+    if (!isEmailFormatValid(email))
+      return next(new ApiError(400, "Invalid email format"));
+    if (!(await hasMXRecord(email)))
+      return next(new ApiError(400, "Invalid email domain"));
 
-    const existing = await db.query(`SELECT * FROM users WHERE email = $1`, [email]);
+    const existing = await db.query(`SELECT * FROM users WHERE email = $1`, [
+      email,
+    ]);
 
     const otp = generateNumericOTP();
     const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
@@ -182,8 +190,14 @@ const loginUser = asyncHandler(
     }
     const userData = user.rows[0];
 
+    if (userData.password === null || userData.password === undefined) {
+      return next(
+        new ApiError(401, "User is not registered. Please register first.")
+      );
+    }
+
     // Check if password is correct
-    const isPasswordValid = comparePassword(password, userData.password);
+    const isPasswordValid = await comparePassword(password, userData.password);
     if (!isPasswordValid) {
       return next(new ApiError(401, "Invalid email or password"));
     }
@@ -207,14 +221,15 @@ const loginUser = asyncHandler(
 
 const verifyOtp = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
+    const { email, password, otp } = req.body;
 
-     const { email, password, otp } = req.body;
-
-    if ([email, password, otp].some(field => !field || field.trim() === "")) {
+    if ([email, password, otp].some((field) => !field || field.trim() === "")) {
       return next(new ApiError(400, "Email, password and OTP are required"));
     }
 
-    const result = await db.query(`SELECT * FROM users WHERE email = $1`, [email]);
+    const result = await db.query(`SELECT * FROM users WHERE email = $1`, [
+      email,
+    ]);
 
     if (result.rowCount === 0) {
       return next(new ApiError(404, "User not found"));
@@ -228,12 +243,19 @@ const verifyOtp = asyncHandler(
 
     // Check OTP expiry
     if (!user.otp_expires_at || new Date(user.otp_expires_at) < new Date()) {
-      return next(new ApiError(401, "OTP has expired. Please request a new one."));
+      return next(
+        new ApiError(401, "OTP has expired. Please request a new one.")
+      );
     }
 
     // Check attempts
     if (user.otp_attempts >= 5) {
-      return next(new ApiError(429, "Too many invalid attempts. Please request a new OTP."));
+      return next(
+        new ApiError(
+          429,
+          "Too many invalid attempts. Please request a new OTP."
+        )
+      );
     }
 
     // Check OTP match
@@ -255,7 +277,6 @@ const verifyOtp = asyncHandler(
     return res
       .status(200)
       .json(new ApiResponse(200, {}, "User registered successfully"));
-
 
     // const { email, password, otp } = req.body;
     // if (
