@@ -5,6 +5,7 @@ import morgan from "morgan";
 import session from "express-session";
 import { setupGoogleStrategy } from "./config/google";
 
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -48,7 +49,7 @@ import googleRoutes from "./routes/google.routes";
 
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/products", productRoutes);
-app.use("/auth", googleRoutes);
+app.use("/api/v1/auth", googleRoutes);
 
 // General error handling middleware , should be last
 app.use((err: any, req: Request, res: Response, next: NextFunction): void => {

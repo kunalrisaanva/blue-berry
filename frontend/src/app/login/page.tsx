@@ -73,7 +73,7 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = '/api/auth/google';
+    window.location.href = 'http://localhost:1111/api/v1/auth/google';
   };
 
   // ifeeldeadly@gmail.com

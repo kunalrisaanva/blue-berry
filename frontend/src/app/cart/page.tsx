@@ -11,11 +11,14 @@ import {
   removeFromCart,
 } from "../../lib/cartSlice";
 import Button from "../components/ui/Button";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state: any) => state.cart.items);
   const isCartEmpty = cartItems.length === 0;
+  const isAuthenticated = useSelector((state: any) => state.auth.isAuthenticated);
+  const router = useRouter();
 
   const subTotal = cartItems.reduce(
     (t: number, i: any) => t + i.price * i.quantity,
@@ -32,6 +35,17 @@ const Page = () => {
   const handleResetCart = () => {
     dispatch(resetCart());
     toast.success("Cart has been reset!");
+  };
+
+  const checkoutHandler = () => {
+    // Handle checkout logic here
+    console.log("working checkout handler", isAuthenticated);
+    if (!isAuthenticated) {
+      toast.error("Please log in first to proceed to checkout.");
+      // router.push("/login");
+      return;
+    }
+    // toast.success("Proceeding to checkout...");
   };
 
   return (
@@ -77,7 +91,7 @@ const Page = () => {
               <span>Total</span>
               <span>${totalAmount.toFixed(2)}</span>
             </div>
-            <Button className="flex items-center justify-center w-full text-xs text-center bg-black text-white p-3 rounded-md mt-4 cursor-pointer">
+            <Button className="flex items-center justify-center w-full text-xs text-center bg-black text-white p-3 rounded-md mt-4 cursor-pointer" onClick={checkoutHandler}>
               Proceed to Checkout
             </Button>
             <Link href="/">
