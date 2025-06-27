@@ -15,6 +15,7 @@ import Button from "../components/ui/Button";
 const Page = () => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state: any) => state.cart.items);
+  const isLoggedIn = useSelector((state: any) => state.auth.isAuthenticated);
   const isCartEmpty = cartItems.length === 0;
 
   const subTotal = cartItems.reduce(
@@ -34,15 +35,27 @@ const Page = () => {
     toast.success("Cart has been reset!");
   };
 
+  const handleProceedToCheckout = () => {
+    if (!isLoggedIn) {
+      toast.error("Please log in to proceed to checkout.");
+      return;
+    }
+    // Add your checkout logic here
+    toast.success("Proceeding to checkout!");
+  };
+
   return (
-    <div className="w-full pt-20 px-4 sm:px-6 lg:px-8">
+    <div className="w-full  pt-20 md:pt-2 px-4 sm:px-6 lg:px-8 ">
       {isCartEmpty ? (
+        /* ---- EMPTY CART ---- */
         <div className="text-center py-20">
-          <img
-            src="/emptyCart.png"
-            alt="Empty Cart"
-            className="mx-auto mb-4 w-40 sm:w-60"
-          />
+          <div>
+            <img
+              src="/emptyCart.png"
+              alt="Empty Cart"
+              className="mx-auto mb-4 w-40 sm:w-60"
+            />
+          </div>
           <h2 className="text-xl sm:text-2xl font-semibold">
             Your cart is empty!
           </h2>
@@ -54,9 +67,10 @@ const Page = () => {
           </Link>
         </div>
       ) : (
-        <div className="flex flex-col-reverse lg:flex-row gap-6 py-6">
-          {/* Order Summary */}
-          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm w-full lg:w-1/2">
+        /* ---- CART FILLED ---- */
+        <div className="flex flex-col  lg:flex-row w-full gap-6  py-6">
+          {/* ====== Order Summary ====== */}
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm w-full lg:w-1/3">
             <h2 className="text-lg sm:text-2xl font-semibold mb-6">
               Order Summary
             </h2>
@@ -73,7 +87,7 @@ const Page = () => {
               <span>Total</span>
               <span>${totalAmount.toFixed(2)}</span>
             </div>
-            <Button className="w-full text-xs sm:text-sm bg-black text-white p-3 rounded-md mt-4">
+            <Button className="flex items-center justify-center w-full text-xs text-center bg-black text-white p-3 rounded-md mt-4 cursor-pointer" onClick={handleProceedToCheckout}>
               Proceed to Checkout
             </Button>
             <Link href="/">
@@ -83,69 +97,69 @@ const Page = () => {
             </Link>
           </div>
 
-          {/* Cart Table */}
-          <div className="p-4 sm:p-6 rounded-xl shadow-sm w-full bg-amber-400">
+          {/* ====== Cart Table ====== */}
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm w-full lg:w-2/3">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">Product</h2>
 
-            {/* Headings */}
-            <div className=" flex justify-end  font-semibold text-gray-700 mb-4 bg-amber-600">
+            {/* headings */}
+            <div className="hidden sm:grid grid-cols-4 font-semibold text-gray-700 mb-4">
               <span>Product</span>
               <span className="text-center">Price</span>
               <span className="text-center">Quantity</span>
-              <span className="text-center">Total</span>
+              <span className="text-right">Total</span>
             </div>
 
-            {/* Items */}
+            {/* items */}
             {cartItems.map((item: any) => (
               <div
                 key={item.id}
-                className="flex justify-start gap-5 items-center border-t "
+                className="grid grid-cols-1 sm:grid-cols-4 items-center border-t py-4 gap-4 sm:gap-0"
               >
-                {/* Product Info */}
-                <div className="flex items-center gap-3">
+                {/* product */}
+                <div className="flex items-center gap-4">
                   <RiDeleteBin6Line
-                    size={18}
+                    size={20}
                     className="cursor-pointer text-gray-600 hover:text-red-800"
                     onClick={() => handleRemoveFromCart(item.id, item.title)}
                   />
                   <img
                     src={item.image}
                     alt={item.title}
-                    className="w-14 h-14 rounded object-cover"
+                    className="w-16 h-16 rounded object-cover"
                   />
                   <span className="text-sm sm:text-base">{item.title}</span>
                 </div>
 
-                {/* Price */}
-                <div className="hidden sm:block text-center text-gray-700 font-medium">
+                {/* price */}
+                <div className="text-center text-gray-700 font-medium sm:block hidden">
                   ${item.price}
                 </div>
 
-                {/* Quantity Controls */}
-                <div className="flex justify-start sm:justify-center items-center gap-2">
+                {/* quantity */}
+                <div className="flex justify-center items-center gap-2">
                   <button
-                    className="border rounded px-2 py-1 text-sm"
+                    className="border rounded px-2 py-1"
                     onClick={() => dispatch(decreaseQuantity(item.id))}
                   >
                     –
                   </button>
                   <span>{item.quantity}</span>
                   <button
-                    className="border rounded px-2 py-1 text-sm"
+                    className="border rounded px-2 py-1"
                     onClick={() => dispatch(increaseQuantity(item.id))}
                   >
                     +
                   </button>
                 </div>
 
-                {/* Total */}
-                <div className="hidden sm:block text-right text-gray-700 font-medium">
-                  ${(item.price * item.quantity).toFixed(2)}
+                {/* total */}
+                <div className="text-right text-gray-700 font-medium sm:block hidden">
+                  ${item.price * item.quantity}
                 </div>
               </div>
             ))}
 
-            {/* Reset Cart */}
+            {/* reset cart */}
             <div className="mt-6">
               <button
                 className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md w-full sm:w-auto"

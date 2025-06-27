@@ -58,17 +58,19 @@ const Signup = () => {
     try {
       const response = await axios.post<RegisterResponse>(
         `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/register`,
-        {email}
+        { email }
       );
 
-      if(response.data.statusCode === 200) {
-        toast.success("Registration successful! Please check your email for the OTP.");
+      if (response.data.statusCode === 200) {
+        toast.success(
+          "Registration successful! Please check your email for the OTP."
+        );
         setStep("otp");
         setOtp(["", "", "", ""]); // Reset OTP inputs
       } else {
         toast.error("Registration failed.");
       }
-    } catch (err:any) {
+    } catch (err: any) {
       toast.error(err.response?.data?.message || "Registration Failed.");
       console.error(err);
     }
@@ -115,6 +117,10 @@ const Signup = () => {
   const handleBack = () => {
     if (step === "otp") setStep("signup");
     else router.back();
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:1111/api/v1/auth/google";
   };
 
   return (
@@ -193,6 +199,7 @@ const Signup = () => {
             </div>
 
             <Button
+              onClick={handleGoogleLogin}
               type="submit"
               className="flex items-center justify-center w-full text-xs text-center bg-black text-white p-3 rounded-md mt-4 cursor-pointer"
             >
@@ -211,7 +218,9 @@ const Signup = () => {
                   key={index}
                   type="text"
                   maxLength={1}
-                  ref={(el) => { inputsRef.current[index] = el; }}
+                  ref={(el) => {
+                    inputsRef.current[index] = el;
+                  }}
                   onChange={(e) => handleOtpChange(e.target.value, index)}
                   className="w-10 h-12 text-center text-lg border rounded-md focus:outline-none"
                 />

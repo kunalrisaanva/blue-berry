@@ -112,10 +112,10 @@ const Navbar = () => {
                       </li>
                       <li>
                         <Link
-                          href="/settings"
+                          href="/orders"
                           className="block px-4 py-2 hover:bg-gray-100"
                         >
-                          Settings
+                          orders
                         </Link>
                       </li>
                       <li>

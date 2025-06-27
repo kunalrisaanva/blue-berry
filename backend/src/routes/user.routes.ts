@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { registerUser , loginUser, verifyOtp , changeEmail , changePassword, resetPasswordMail, resetPassword } from "../controllers/user.controller";
+import { registerUser , loginUser, verifyOtp , changeEmail , changePassword, resetPasswordMail, resetPassword , getUser} from "../controllers/user.controller";
 // import { requestPasswordReset } from "../controllers/resetPassword.controller";
 
 import passport from "../middleware/passport.middleware"
@@ -25,7 +25,7 @@ router.get(
       res.json({ message: "You accessed a protected route!", user: req.user });
     }
 );
-
+router.route("/me").get(getUser);
 router.route("/change-email").post(changeEmail); 
 router.route("/change-password").post(changePassword);
 

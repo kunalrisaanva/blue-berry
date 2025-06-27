@@ -39,6 +39,7 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     loginSuccess: (state, action) => {
+      console.log("google login action payload:", action.payload);
       const { id, username, email, userimage, token, role } = action.payload;
       state.isAuthenticated = true;
       state.user = { id, username, email, userimage };
@@ -59,8 +60,26 @@ const authSlice = createSlice({
 
       clearAuthFromLocalStorage();
     },
+
+    googleLoginSuccess: (state, action) => {
+      console.log("google login action payload:", action.payload);
+      const { id, username, email, userimage, token, role } = action.payload;
+      state.isAuthenticated = true;
+      state.user = { id, username, email, userimage };
+      state.token = token;
+      state.isAdmin = role;
+      state.loading = false;
+      state.error = null;
+      saveAuthToLocalStorage(token, { id, username, email, userimage });
+    },
+
+    // setUserDetails: (state, action) => {
+    //   const { id, username, email } = action.payload;
+    //   state.user = { id, username, email,  };
+    //   saveAuthToLocalStorage(state.token!, { id, username, email });
+    // }
   },
 });
 
-export const { loginSuccess, Logout } = authSlice.actions;
+export const { loginSuccess, Logout, googleLoginSuccess } = authSlice.actions;
 export default authSlice.reducer;

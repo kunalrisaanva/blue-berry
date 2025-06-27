@@ -1,9 +1,30 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
+import Loader from '../components/Loder';
 
 const Page = () => {
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+   const [checkingAuth, setCheckingAuth] = useState(true);
+  const router = useRouter();
+  const isLoggedIn = useSelector((state: any) => state.auth.isLoggedIn);
+
+
+  
+  useEffect(() => {
+    if (!isLoggedIn) {
+      router.replace("/login"); // Redirect if not logged in
+    } else {
+      setCheckingAuth(false); // Allow render if authenticated
+    }
+  }, [isLoggedIn, router]);
+
+
+  if (checkingAuth) return <Loader />;
+  
 
   return (
     <div className="my-10 px-6">

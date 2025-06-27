@@ -526,11 +526,34 @@ const resetPassword = asyncHandler(
   }
 );
 
+const getUser = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id; // Assuming user ID is stored in req.user
+
+    if (!userId) {
+      return next(new ApiError(401, "Unauthorized"));
+    }
+
+    const user = await db.query(`SELECT * FROM users WHERE id = $1`, [userId]);
+    if (user.rowCount === 0) {
+      return next(new ApiError(404, "User not found"));
+    }
+
+    const response = new ApiResponse(
+      200,
+      user.rows[0],
+      "User retrieved successfully"
+    );
+    return res.status(200).json(response);
+  }
+);
+
 export {
   registerUser,
   loginUser,
   verifyOtp,
   changeEmail,
+  getUser,
   changePassword,
   resetPasswordMail,
   resetPassword,

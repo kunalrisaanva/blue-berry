@@ -4,7 +4,6 @@ import Link from "next/link";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import axios from "axios";
 import { imageOptimizer } from "next/dist/server/image-optimizer";
-// import { D } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess } from "@/lib/authSlice";
 import Loader from "../components/Loder";
@@ -72,7 +71,7 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "/api/auth/google";
+    window.location.href = "http://localhost:1111/api/v1/auth/google";
   };
 
   // ifeeldeadly@gmail.com
