@@ -1,5 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-
+import {
+  saveAuthToLocalStorage,
+  loadAuthFromLocalStorage,
+  clearAuthFromLocalStorage,
+} from "@/lib/authlocalStorage";
 
 interface User {
   id: any;
@@ -18,41 +22,45 @@ interface AuthState {
   isOpen: boolean;
 }
 
+const localData = loadAuthFromLocalStorage();
+
 const initialState: AuthState = {
-  isAuthenticated: false,
-  user: null,
-  token: null,
+  isAuthenticated: !!localData.token,
+  user: localData.user,
+  token: localData.token,
   loading: false,
   error: null,
   isAdmin: false,
-  isOpen: true, // State to track if the profile modal is open
+  isOpen: true,
 };
+
 const authSlice = createSlice({
-  name: "authSlice",  
+  name: "authSlice",
   initialState,
   reducers: {
-    loginSuccess: (state, action) => {  
-      // console.log("loginSuccess action payload:--", action.payload);
-      const {id,username,email,userimage} = action.payload;
-        state.isAuthenticated = true;
-        state.user = {id,username,email,userimage};
-        state.token = action.payload.token;
-        state.loading = false;
-        state.error = null;
-        state.isAdmin = action.payload?.role;
-        },
+    loginSuccess: (state, action) => {
+      const { id, username, email, userimage, token, role } = action.payload;
+      state.isAuthenticated = true;
+      state.user = { id, username, email, userimage };
+      state.token = token;
+      state.isAdmin = role;
+      state.loading = false;
+      state.error = null;
+
+      saveAuthToLocalStorage(token, { id, username, email, userimage });
+    },
     Logout: (state) => {
-        state.isAuthenticated = false;
-        state.user = null;
-        state.token = null;
-        state.loading = false;
-        state.error = null;
-        state.isAdmin = false;
-    }
+      state.isAuthenticated = false;
+      state.user = null;
+      state.token = null;
+      state.loading = false;
+      state.error = null;
+      state.isAdmin = false;
+
+      clearAuthFromLocalStorage();
+    },
   },
 });
 
-
 export const { loginSuccess, Logout } = authSlice.actions;
-
 export default authSlice.reducer;

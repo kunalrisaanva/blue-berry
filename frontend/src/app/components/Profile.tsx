@@ -1,6 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
+import { toast } from "sonner";
+import axios from "axios";
 
 interface ProfileProps {
   onClose: () => void;
@@ -10,10 +12,45 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
   const [selectedTab, setSelectedTab] = useState<"profile" | "security">(
     "profile"
   );
+  const [showResetForm, setShowResetForm] = useState(false);
+  const [currentPassword, setcurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   const user = useSelector((state: any) => state.auth.user);
-  console.log("User details:", user);
 
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword) {
+      toast.error("Please enter both passwords");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("authToken");
+
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/change-password`,
+        { currentPassword, newPassword },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (res.status === 200) {
+        toast.success("Password changed successfully!");
+        setShowResetForm(false);
+        setcurrentPassword("");
+        setNewPassword("");
+      } else {
+        toast.error("Failed to change password");
+      }
+    } catch (error: any) {
+      console.error("Error:", error);
+      toast.error(error.response?.data?.message || "Something went wrong");
+    }
+  };
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
       <div className="bg-white/90 backdrop-blur-md rounded-md shadow-2xl w-full max-w-4xl h-[90vh] md:h-[700px] flex flex-col md:flex-row relative overflow-hidden">
@@ -31,7 +68,7 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
           <p className="text-sm text-gray-500 mb-4">
             Manage your account info.
           </p>
-          <ul className="space-y-3 flex  flex-col gap-4">
+          <ul className="space-y-3 flex flex-col gap-4">
             <li
               className={`flex items-center space-x-2 cursor-pointer ${
                 selectedTab === "profile"
@@ -52,7 +89,7 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
               onClick={() => setSelectedTab("security")}
             >
               <span>🛡️</span>
-              <span>Security</span>
+              <span>Settings</span>
             </li>
           </ul>
           <div className="mt-8 md:absolute bottom-4 left-6 text-xs text-gray-400">
@@ -115,15 +152,55 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
             </>
           ) : (
             <>
-              <h3 className="text-lg font-semibold mb-4">Security</h3>
+              <h3 className="text-lg font-semibold mb-4">Settings</h3>
+
+              {/* Reset Password */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Change password
                 </label>
-                <button className="text-blue-500 text-sm hover:underline">
-                  Reset Password
-                </button>
+                {showResetForm ? (
+                  <div className="space-y-3 mt-2">
+                    <input
+                      type="password"
+                      placeholder="Current Password"
+                      value={currentPassword}
+                      onChange={(e) => setcurrentPassword(e.target.value)}
+                      className="w-full border rounded px-3 py-1.5 text-sm"
+                    />
+                    <input
+                      type="password"
+                      placeholder="New Password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="w-full border rounded px-3 py-1.5 text-sm"
+                    />
+                    <div className="flex gap-4">
+                      <button
+                        onClick={() => setShowResetForm(false)}
+                        className="text-gray-500 text-sm"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleChangePassword}
+                        className="text-sm text-white bg-blue-500 hover:bg-blue-600 px-4 py-1.5 rounded"
+                      >
+                        Change
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    className="text-blue-500 text-sm hover:underline mt-1"
+                    onClick={() => setShowResetForm(true)}
+                  >
+                    Reset Password
+                  </button>
+                )}
               </div>
+
+              {/* Email */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Change email
@@ -132,6 +209,8 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
                   Update Email
                 </button>
               </div>
+
+              {/* 2FA */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Two-factor authentication

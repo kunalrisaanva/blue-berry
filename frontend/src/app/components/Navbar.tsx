@@ -3,30 +3,33 @@ import React, { useState, useRef, useEffect } from "react";
 import Badge from "@mui/material/Badge";
 import { PiShoppingCartSimpleDuotone, PiUserDuotone } from "react-icons/pi";
 import Link from "next/link";
-import { useRouter } from "next/navigation"; // Import useRouter
-import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
+import { useSelector, useDispatch } from "react-redux";
+import { Logout } from "@/lib/authSlice";
 import SearchBar from "./ui/SearchBar";
 import Profile from "@/app/components/Profile";
 import { FaSignInAlt } from "react-icons/fa";
 
 const Navbar = () => {
-  const cartItems = useSelector((state: any) => state.cart.items); // Get cart items from Redux store
-  const [cartItemCount, setCartItemCount] = useState(0); // Local state for cart item count
+  const [hasMounted, setHasMounted] = useState(false);
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  const dispatch = useDispatch();
+  const cartItems = useSelector((state: any) => state.cart.items);
+  const isLoggedIn = useSelector((state: any) => state.auth.isAuthenticated);
+  const router = useRouter();
+
+  const [cartItemCount, setCartItemCount] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    useSelector((state: any) => state.auth.isAuthenticated)
-  ); // Track user login status
-
   const dropdownRef = useRef(null);
-  const router = useRouter(); // Initialize useRouter
 
-  // Update cart item count whenever cartItems changes
   useEffect(() => {
     setCartItemCount(cartItems.length);
   }, [cartItems]);
 
-  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -40,21 +43,19 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogin = () => {
-    // Navigate to the login page
-    router.push("/login");
-  };
+  const handleLogin = () => router.push("/login");
 
   const handleLogout = () => {
-    // Simulate logout (replace with actual logout logic)
-    setIsLoggedIn(false);
-    alert("You have been logged out.");
+    dispatch(Logout());
+    setShowDropdown(false);
   };
+
+  if (!hasMounted) return null;
 
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full z-50 bg-white shadow-md min-h-[4.5rem] flex flex-row justify-center ">
-        <div className="flex flex-col md:flex-row w-[1300px] gap-4 p-2  md:items-center">
+      <nav className="fixed top-0 left-0 w-full z-50 bg-white shadow-md min-h-[4.5rem] flex flex-row justify-center">
+        <div className="flex flex-col md:flex-row w-[1300px] gap-4 p-2 md:items-center">
           {/* Logo */}
           <div className="w-auto">
             <Link href="/">
@@ -119,10 +120,7 @@ const Navbar = () => {
                       </li>
                       <li>
                         <button
-                          onClick={() => {
-                            handleLogout();
-                            setShowDropdown(false);
-                          }}
+                          onClick={handleLogout}
                           className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                         >
                           Sign out

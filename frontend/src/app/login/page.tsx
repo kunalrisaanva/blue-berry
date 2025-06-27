@@ -29,7 +29,7 @@ const Login = () => {
       return;
     }
 
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       toast.error("Please enter a valid email address.");
       return;
     }
@@ -46,10 +46,9 @@ const Login = () => {
       .then((response: any) => {
         if (response.status === 200) {
           setIsLoading(true);
-          // console.log("response from login api ===> ",response.data.data);
           dispatch(loginSuccess(response.data.data));
 
-          // localStorage.setItem("token") // to do set token in local storage coming fron api 
+          // localStorage.setItem("token") // to do set token in local storage coming fron api
           // console.log("Login successful:", response.data.data.safeUserData);
           setIsLoading(false);
           router.push("/"); // Redirect to home page after successful login
@@ -61,7 +60,7 @@ const Login = () => {
           setIsLoading(false);
         }
       })
-      .catch((e:any) => {
+      .catch((e: any) => {
         setIsLoading(false);
         toast.error(e.response?.data?.message || "Login failed.");
         console.log("ERROR-", e);
@@ -73,7 +72,7 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:1111/api/v1/auth/google';
+    window.location.href = "/api/auth/google";
   };
 
   // ifeeldeadly@gmail.com

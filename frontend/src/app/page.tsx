@@ -24,7 +24,6 @@ function Main({}: Props) {
             `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/products/all-prodcuts`
           );
           const responseData = response.data.data;
-          console.log("response", responseData);
           setcardsData(responseData);
         } catch (error) {
           setError(error instanceof Error ? error.message : String(error));
