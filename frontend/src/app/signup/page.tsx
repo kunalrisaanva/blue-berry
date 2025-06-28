@@ -199,7 +199,6 @@ const Signup = () => {
             </div>
 
             <Button
-              onClick={handleGoogleLogin}
               type="submit"
               className="flex items-center justify-center w-full text-xs text-center bg-black text-white p-3 rounded-md mt-4 cursor-pointer"
             >

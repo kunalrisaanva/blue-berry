@@ -147,7 +147,7 @@ const Page = () => {
         </div>
       ) : (
         /* ---- CART FILLED ---- */
-        <div className="flex flex-col  lg:flex-row w-full gap-6  py-6">
+        <div className="flex flex-col-reverse  lg:flex-row w-full gap-6  py-6">
           {/* ====== Order Summary ====== */}
           <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm w-full lg:w-1/3">
             <h2 className="text-lg sm:text-2xl font-semibold mb-6">

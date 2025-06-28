@@ -180,7 +180,14 @@ const Login = () => {
     Continue
   </button> */}
         </form>
-
+        <p className="text-sm text-gray-500 text-center mt-4">
+          <Link
+            href="/login/forgetpassword"
+            className="text-blue-600 hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </p>
         <p className="text-sm text-gray-500 text-center mt-6">
           Don’t have an account?{" "}
           <Link href="/signup" className="text-blue-600 hover:underline">

@@ -29,16 +29,13 @@ const Page = () => {
     try {
       const token = localStorage.getItem("authToken");
 
-      console.log("order token -->",token);
+      console.log("order token -->", token);
 
-       const {data} = await axios.get(
-          `http://localhost:1111/my-orders`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+      const { data } = await axios.get(`http://localhost:1111/my-orders`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setOrders(data.data || []);
     } catch (err) {
       console.error("Failed to fetch orders", err);
@@ -50,7 +47,7 @@ const Page = () => {
   if (checkingAuth || loading) return <Loader />;
 
   return (
-    <div className="my-10 px-4 sm:px-6 lg:px-8">
+    <div className="my-10   pt-24 sm:px-6 lg:px-8">
       <div className="w-full rounded-md border border-gray-300 shadow-sm p-4 sm:p-6 bg-white">
         <h1 className="text-xl sm:text-3xl font-semibold text-black mb-6">
           Order List
@@ -60,7 +57,7 @@ const Page = () => {
           <p className="text-center text-gray-600">No orders yet.</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-[600px] w-full text-left border-separate border-spacing-y-2">
+            <table className=" w-full text-left border-separate border-spacing-y-2">
               <thead>
                 <tr className="text-gray-600 text-xs sm:text-sm font-medium">
                   <th className="px-4 py-2">Order No.</th>
