@@ -46,11 +46,8 @@ const Login = () => {
         if (response.status === 200) {
           setIsLoading(true);
           dispatch(loginSuccess(response.data.data));
-
-          // localStorage.setItem("token") // to do set token in local storage coming fron api
-          // console.log("Login successful:", response.data.data.safeUserData);
           setIsLoading(false);
-          router.push("/"); // Redirect to home page after successful login
+          router.push("/");
           toast.success("Login successful!");
         } else {
           // Handle error response

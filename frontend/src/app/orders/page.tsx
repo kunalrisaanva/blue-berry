@@ -1,83 +1,130 @@
-'use client';
-import React, { useState,useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useSelector } from 'react-redux';
-import { useRouter } from 'next/navigation';
-import Loader from '../components/Loder';
+"use client";
+import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
+import Loader from "../components/Loder";
+import axios from "axios";
 
 const Page = () => {
+  const [orders, setOrders] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const [loading, setLoading] = useState(false);
-   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
   const router = useRouter();
-  const isLoggedIn = useSelector((state: any) => state.auth.isLoggedIn);
+  const isLoggedIn = useSelector((state: any) => state.auth.isAuthenticated);
 
-
-  
   useEffect(() => {
     if (!isLoggedIn) {
-      router.replace("/login"); // Redirect if not logged in
+      router.replace("/login");
     } else {
-      setCheckingAuth(false); // Allow render if authenticated
+      setCheckingAuth(false);
+      fetchOrders();
     }
-  }, [isLoggedIn, router]);
+  }, [isLoggedIn]);
 
+  const fetchOrders = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
 
-  if (checkingAuth) return <Loader />;
-  
+      console.log("order token -->",token);
+
+       const {data} = await axios.get(
+          `http://localhost:1111/my-orders`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      setOrders(data.data || []);
+    } catch (err) {
+      console.error("Failed to fetch orders", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (checkingAuth || loading) return <Loader />;
 
   return (
-    <div className="my-10 px-6">
-      <div className="w-full rounded-md border border-gray-300 shadow-sm p-6 bg-white">
-        <h1 className="text-3xl font-semibold text-black mb-6">Order List</h1>
+    <div className="my-10 px-4 sm:px-6 lg:px-8">
+      <div className="w-full rounded-md border border-gray-300 shadow-sm p-4 sm:p-6 bg-white">
+        <h1 className="text-xl sm:text-3xl font-semibold text-black mb-6">
+          Order List
+        </h1>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-[800px] w-full text-left border-separate border-spacing-y-2">
-            <thead>
-              <tr className="text-gray-600 text-sm font-medium">
-                <th className="px-4 py-2">Order Number</th>
-                <th className="px-4 py-2">Date</th>
-                <th className="px-4 py-2">Customer</th>
-                <th className="px-4 py-2">Email</th>
-                <th className="px-4 py-2">Total</th>
-                <th className="px-4 py-2">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[1, 2].map((item, i) => (
-                <tr
-                  key={i}
-                  className="bg-gray-50 hover:bg-gray-100 text-sm cursor-pointer"
-                  onClick={() => setShowModal(true)}
-                >
-                  <td className="px-4 py-2">9bbfdf05cf</td>
-                  <td className="px-4 py-2">5/10/2025</td>
-                  <td className="px-4 py-2">Kunal Risaanva</td>
-                  <td className="px-4 py-2">kunalrisaanva12@gmail.com</td>
-                  <td className="px-4 py-2">$28.00</td>
-                  <td className="px-4 py-2">
-                    <span className="bg-green-200 text-green-800 px-2 py-1 rounded text-xs font-medium">
-                      Paid
-                    </span>
-                  </td>
+        {orders.length === 0 ? (
+          <p className="text-center text-gray-600">No orders yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-[600px] w-full text-left border-separate border-spacing-y-2">
+              <thead>
+                <tr className="text-gray-600 text-xs sm:text-sm font-medium">
+                  <th className="px-4 py-2">Order No.</th>
+                  <th className="px-4 py-2">Date</th>
+                  <th className="px-4 py-2">Customer</th>
+                  <th className="px-4 py-2">Email</th>
+                  <th className="px-4 py-2">Total</th>
+                  <th className="px-4 py-2">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {orders.map((order, i) => (
+                  <tr
+                    key={i}
+                    className="bg-gray-50 hover:bg-gray-100 text-xs sm:text-sm cursor-pointer"
+                    onClick={() => {
+                      setSelectedOrder(order);
+                      setShowModal(true);
+                    }}
+                  >
+                    <td className="px-4 py-2">
+                      {order.order_number ||
+                        order.razorpay_order_id?.slice(-10)}
+                    </td>
+                    <td className="px-4 py-2">
+                      {new Date(
+                        order.date || order.created_at
+                      ).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-2">
+                      {order.customer_name || "N/A"}
+                    </td>
+                    <td className="px-4 py-2">{order.email || "N/A"}</td>
+                    <td className="px-4 py-2">${order.amount}</td>
+                    <td className="px-4 py-2">
+                      <span
+                        className={`px-2 py-1 rounded text-xs font-medium ${
+                          order.status === "paid"
+                            ? "bg-green-200 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {order.status || "Pending"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Modal */}
       <AnimatePresence>
-        {showModal && (
+        {showModal && selectedOrder && (
           <motion.div
-            className="fixed inset-0 bg-black/60   bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white w-full max-w-lg rounded-xl shadow-xl p-6 relative"
+              className="bg-white w-full max-w-lg rounded-xl shadow-xl p-6 relative mx-4"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -89,18 +136,22 @@ const Page = () => {
               >
                 &times;
               </button>
-              <h2 className="text-2xl font-semibold mb-4">Order Details</h2>
+              <h2 className="text-xl sm:text-2xl font-semibold mb-4">
+                Order Details
+              </h2>
               <p className="text-sm text-gray-600 mb-2">
-                Order Number: <span className="font-medium">9bbfdf05cf</span>
+                <strong>Order No:</strong>{" "}
+                {selectedOrder.order_number || selectedOrder.razorpay_order_id}
               </p>
               <p className="text-sm text-gray-600 mb-2">
-                Customer: <span className="font-medium">Kunal Risaanva</span>
+                <strong>Customer:</strong>{" "}
+                {selectedOrder.customer_name || "N/A"}
               </p>
               <p className="text-sm text-gray-600 mb-2">
-                Email: <span className="font-medium">kunalrisaanva12@gmail.com</span>
+                <strong>Email:</strong> {selectedOrder.email || "N/A"}
               </p>
               <p className="text-sm text-gray-600">
-                Total: <span className="font-medium">$28.00</span>
+                <strong>Total:</strong> ${selectedOrder.amount}
               </p>
             </motion.div>
           </motion.div>

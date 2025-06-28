@@ -5,7 +5,6 @@ import morgan from "morgan";
 import session from "express-session";
 import { setupGoogleStrategy } from "./config/google";
 
-
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -17,7 +16,6 @@ app.use(
     saveUninitialized: false,
   })
 );
-
 
 // Initialize Google OAuth strategy
 setupGoogleStrategy();
@@ -46,10 +44,12 @@ app.get("/", (req: Request, res: Response) => {
 import { userRoutes } from "./routes/user.routes";
 import { productRoutes } from "./routes/product.routes";
 import googleRoutes from "./routes/google.routes";
+import { razorpayRoutes } from "./routes/razorpay.routes";
 
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/auth", googleRoutes);
+app.use(razorpayRoutes);
 
 // General error handling middleware , should be last
 app.use((err: any, req: Request, res: Response, next: NextFunction): void => {

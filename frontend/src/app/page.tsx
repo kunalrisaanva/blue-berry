@@ -45,7 +45,7 @@ function Main() {
   useEffect(() => {
     const token = searchParams.get("token");
     if (!token) {
-      setGoogleLoginDone(true); 
+      setGoogleLoginDone(true);
       return;
     }
 

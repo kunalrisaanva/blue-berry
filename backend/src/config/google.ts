@@ -49,7 +49,7 @@ export const setupGoogleStrategy = () => {
                 false
               );
             }
-    
+
             // 3. Otherwise, insert new user
             console.log("working code here 1");
             console.log(profile.id, profile);
@@ -64,13 +64,16 @@ export const setupGoogleStrategy = () => {
                 // profile.photos?.[0]?.value,
               ]
             );
-
             user = insertResult.rows[0];
           }
 
-          const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
-            expiresIn: "1h",
-          });
+          const token = jwt.sign(
+            { id: user.id },
+            process.env.JWT_SECRET as string,
+            {
+              expiresIn: "1h",
+            }
+          );
 
           return done(null, { ...user, token });
         } catch (error) {

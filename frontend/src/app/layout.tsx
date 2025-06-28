@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { useEffect } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,6 +25,14 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
   const hideNavbar = pathname === "/login" || pathname === "/signup";
+
+  useEffect(() => {
+  const script = document.createElement("script");
+  script.src = "https://checkout.razorpay.com/v1/checkout.js";
+  script.async = true;
+  document.body.appendChild(script);
+}, []);
+
 
   return (
     <html lang="en">

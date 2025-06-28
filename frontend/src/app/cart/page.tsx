@@ -11,6 +11,9 @@ import {
   removeFromCart,
 } from "../../lib/cartSlice";
 import Button from "../components/ui/Button";
+import { imageOptimizer } from "next/dist/server/image-optimizer";
+import axios from "axios";
+import { useEffect } from "react";
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -25,6 +28,13 @@ const Page = () => {
   const discount = 2.8;
   const totalAmount = subTotal - discount;
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
   const handleRemoveFromCart = (id: number, title: string) => {
     dispatch(removeFromCart(id));
     toast.success(`${title} removed from the cart!`);
@@ -35,13 +45,82 @@ const Page = () => {
     toast.success("Cart has been reset!");
   };
 
-  const handleProceedToCheckout = () => {
+  const handleProceedToCheckout = async () => {
     if (!isLoggedIn) {
       toast.error("Please log in to proceed to checkout.");
       return;
     }
-    // Add your checkout logic here
-    toast.success("Proceeding to checkout!");
+
+    try {
+      // 1. Call backend to create Razorpay order
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_API_URL}create-order`,
+        {
+          items: cartItems,
+          amount: totalAmount,
+        }
+      );
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
+        amount: data.amount,
+        currency: data.currency,
+        name: "Blue-Berry",
+        description: "Cart Checkout",
+        order_id: data.data.orderId,
+        handler: async function (response: any) {
+          // console.log("Full Razorpay response:", response);
+
+          const razorpay_order_id =
+            response.razorpay_order_id || response.razorpayOrderId;
+          const razorpay_payment_id =
+            response.razorpay_payment_id || response.razorpayPaymentId;
+          const razorpay_signature =
+            response.razorpay_signature || response.razorpaySignature;
+
+          if (
+            !razorpay_order_id ||
+            !razorpay_payment_id ||
+            !razorpay_signature
+          ) {
+            toast.error("Payment response missing required fields!");
+            return;
+          }
+
+          try {
+            // 3. Verify payment on backend
+            const verifyRes = await axios.post(
+              `${process.env.NEXT_PUBLIC_BASE_API_URL}verify`,
+              {
+                razorpay_order_id,
+                razorpay_payment_id,
+                razorpay_signature,
+              }
+            );
+
+            if (verifyRes.data.success) {
+              toast.success("Payment successful!");
+              dispatch(resetCart());
+            } else {
+              toast.error("Payment verification failed!");
+            }
+          } catch (error) {
+            console.error("Verification API error:", error);
+            toast.error("Payment verification failed!");
+          }
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      // 4. Open Razorpay checkout popup
+      const razorpay = new (window as any).Razorpay(options);
+      razorpay.open();
+    } catch (err) {
+      console.error("Checkout Error:", err);
+      toast.error("Checkout failed!");
+    }
   };
 
   return (
@@ -87,7 +166,10 @@ const Page = () => {
               <span>Total</span>
               <span>${totalAmount.toFixed(2)}</span>
             </div>
-            <Button className="flex items-center justify-center w-full text-xs text-center bg-black text-white p-3 rounded-md mt-4 cursor-pointer" onClick={handleProceedToCheckout}>
+            <Button
+              className="flex items-center justify-center w-full text-xs text-center bg-black text-white p-3 rounded-md mt-4 cursor-pointer"
+              onClick={handleProceedToCheckout}
+            >
               Proceed to Checkout
             </Button>
             <Link href="/">
