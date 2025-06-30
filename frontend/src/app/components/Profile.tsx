@@ -9,14 +9,18 @@ interface ProfileProps {
 }
 
 const Profile: React.FC<ProfileProps> = ({ onClose }) => {
-  const [selectedTab, setSelectedTab] = useState<"profile" | "security">(
-    "profile"
-  );
+  const [selectedTab, setSelectedTab] = useState<"profile" | "security">("profile");
   const [showResetForm, setShowResetForm] = useState(false);
   const [currentPassword, setcurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
   const user = useSelector((state: any) => state.auth.user);
+
+  const [showUsernameForm, setShowUsernameForm] = useState(false);
+  const [username, setUsername] = useState(user?.username || "");
+
+  const [showPhoneForm, setShowPhoneForm] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || "");
 
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword) {
@@ -51,10 +55,74 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
       toast.error(error.response?.data?.message || "Something went wrong");
     }
   };
+
+  const handleUsernameUpdate = async () => {
+    if (!username.trim()) {
+      toast.error("Username cannot be empty");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("authToken");
+
+      const res = await axios.put(
+        `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/update-username`,
+        { username },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (res.status === 200) {
+        toast.success("Username updated successfully!");
+        setShowUsernameForm(false);
+      } else {
+        toast.error("Failed to update username");
+      }
+    } catch (error: any) {
+      console.error("Error:", error);
+      toast.error(error.response?.data?.message || "Something went wrong");
+    }
+  };
+
+  const handlePhoneUpdate = async () => {
+    if (!phoneNumber.trim()) {
+      toast.error("Phone number cannot be empty");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("authToken");
+
+      const res = await axios.put(
+        `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/update-phone`,
+        { phoneNumber },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (res.status === 200) {
+        toast.success("Phone number updated successfully!");
+        setShowPhoneForm(false);
+      } else {
+        toast.error("Failed to update phone number");
+      }
+    } catch (error: any) {
+      console.error("Error:", error);
+      toast.error(error.response?.data?.message || "Something went wrong");
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
       <div className="bg-white/90 backdrop-blur-md rounded-md shadow-2xl w-full max-w-4xl h-[90vh] md:h-[700px] flex flex-col md:flex-row relative overflow-hidden">
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold z-10"
@@ -65,9 +133,7 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
         {/* Sidebar */}
         <div className="w-full md:w-1/3 border-b md:border-b-0 md:border-r p-6 bg-white/60 backdrop-blur-sm rounded-t-md md:rounded-l-md">
           <h2 className="text-xl font-semibold mb-2">Account</h2>
-          <p className="text-sm text-gray-500 mb-4">
-            Manage your account info.
-          </p>
+          <p className="text-sm text-gray-500 mb-4">Manage your account info.</p>
           <ul className="space-y-3 flex flex-col gap-4">
             <li
               className={`flex items-center space-x-2 cursor-pointer ${
@@ -96,9 +162,7 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
             Secured by{" "}
             <span className="font-semibold text-gray-600">Future Nodes</span>
             <br />
-            <span className="text-orange-500 font-medium">
-              Development mode
-            </span>
+            <span className="text-orange-500 font-medium">Development mode</span>
           </div>
         </div>
 
@@ -107,6 +171,8 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
           {selectedTab === "profile" ? (
             <>
               <h3 className="text-lg font-semibold mb-4">Profile details</h3>
+
+              {/* Username Section */}
               <div className="mb-6">
                 <div className="flex items-center space-x-4">
                   <img
@@ -114,16 +180,48 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
                     alt="Profile"
                     className="rounded-full w-10 h-10"
                   />
-                  <span className="font-medium">kunal jangra</span>
-                  <a href="#" className="ml-auto text-blue-500 text-sm">
-                    Update profile
-                  </a>
+                  <span className="font-medium">
+                    {user?.username || "No username set"}
+                  </span>
+                  {showUsernameForm ? (
+                    <div className="flex flex-col gap-1 ml-auto">
+                      <input
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Enter username"
+                        className="border px-2 py-1 text-sm rounded"
+                      />
+                      <div className="flex gap-4 ">
+                        <button
+                          onClick={() => setShowUsernameForm(false)}
+                          className="text-xs text-gray-500"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleUsernameUpdate}
+                          className="text-xs text-white bg-blue-500 hover:bg-blue-600 px-2 py-1 rounded"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setShowUsernameForm(true)}
+                      className="ml-auto text-blue-500 text-sm"
+                    >
+                      {user?.username ? "Edit username" : "Add username"}
+                    </button>
+                  )}
                 </div>
               </div>
 
+              {/* Email Section */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email addresses
+                  Email address
                 </label>
                 <div className="flex items-center justify-between">
                   <span>{user?.email}</span>
@@ -131,11 +229,60 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
                     Primary
                   </span>
                 </div>
-                <button className="mt-2 text-blue-500 text-sm">
-                  + Add email address
-                </button>
               </div>
 
+              {/* Phone Number Section */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone number
+                </label>
+                {user?.phoneNumber ? (
+                  <div className="flex items-center justify-between">
+                    <span>{user.phoneNumber}</span>
+                    <button
+                      onClick={() => setShowPhoneForm(true)}
+                      className="text-blue-500 text-sm"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowPhoneForm(true)}
+                    className="text-blue-500 text-sm"
+                  >
+                    + Add phone number
+                  </button>
+                )}
+
+                {showPhoneForm && (
+                  <div className="mt-2 space-y-2">
+                    <input
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      placeholder="Enter phone number"
+                      className="w-full border px-3 py-1.5 text-sm rounded"
+                    />
+                    <div className="flex gap-4">
+                      <button
+                        onClick={() => setShowPhoneForm(false)}
+                        className="text-gray-500 text-sm"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handlePhoneUpdate}
+                        className="text-sm text-white bg-blue-500 hover:bg-blue-600 px-4 py-1.5 rounded"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Connected accounts */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Connected accounts
@@ -210,15 +357,7 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
                 </button>
               </div>
 
-              {/* 2FA */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Two-factor authentication
-                </label>
-                <button className="text-blue-500 text-sm hover:underline">
-                  Enable 2FA
-                </button>
-              </div>
+         
             </>
           )}
         </div>
