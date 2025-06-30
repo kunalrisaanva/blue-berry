@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const hideNavbar = pathname === "/login" || pathname === "/signup";
+  const hideNavbar = pathname === "/login" || pathname === "/signup" || pathname === "/login/forgetpassword";
 
   useEffect(() => {
   const script = document.createElement("script");

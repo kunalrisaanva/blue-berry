@@ -6,6 +6,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { toast } from "sonner";
 import axios from "axios";
 import Button from "../components/ui/Button";
+import Image from "next/image";
 
 const Signup = () => {
   const router = useRouter();
@@ -130,10 +131,12 @@ const Signup = () => {
           <button onClick={handleBack} className="text-gray-500">
             ←
           </button>
-          <img
+          <Image
             src="https://berry.reactbd.com/_next/static/media/logo.8fe5d04c.png"
             alt="Blue Berry"
             className="h-8"
+            height={85}
+            width={85}
           />
           <div className="w-5" />
         </div>
@@ -147,14 +150,16 @@ const Signup = () => {
 
         {step === "signup" && (
           <form onSubmit={handleSubmit}>
-            <button className="w-full flex items-center justify-center gap-2 border px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-              <img
+            <Button onClick={handleGoogleLogin} className="w-full flex items-center justify-center gap-2 border px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+              <Image
                 src="https://www.svgrepo.com/show/475656/google-color.svg"
-                className="h-5 w-5"
+                // className="h-5 w-5"
                 alt="Google"
+                width={25}
+                height={25}
               />
               Continue with Google
-            </button>
+            </Button>
 
             <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">

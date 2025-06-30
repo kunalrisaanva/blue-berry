@@ -15,7 +15,7 @@ const forgotpassword = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/forgot-password`,
+        `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/request-password-reset`,
         { email }
       );
 
