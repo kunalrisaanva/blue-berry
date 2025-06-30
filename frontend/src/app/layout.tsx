@@ -24,15 +24,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const hideNavbar = pathname === "/login" || pathname === "/signup" || pathname === "/login/forgetpassword";
+
+  // List of paths where Navbar and Footer should be hidden
+  const hiddenPaths = ["/login", "/signup", "/login/forgetpassword", "/reset-password"];
+  const hideNavbar = hiddenPaths.includes(pathname);
 
   useEffect(() => {
-  const script = document.createElement("script");
-  script.src = "https://checkout.razorpay.com/v1/checkout.js";
-  script.async = true;
-  document.body.appendChild(script);
-}, []);
-
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
 
   return (
     <html lang="en">
@@ -41,8 +43,8 @@ export default function RootLayout({
       >
         <ReduxProvider>
           {!hideNavbar && <Navbar />}
-          <div className=" flex  justify-center ">
-            <div className="w-full max-w-[1300px] pt-[4.5rem] m-2 ">
+          <div className="flex justify-center">
+            <div className="w-full max-w-[1300px] pt-[4.5rem] m-2">
               {children}
             </div>
           </div>

@@ -8,6 +8,7 @@ import {
   resetPasswordMail,
   resetPassword,
   getUser,
+  changeUsername,
 } from "../controllers/user.controller";
 // import { requestPasswordReset } from "../controllers/resetPassword.controller";
 
@@ -35,5 +36,8 @@ router.get(
 router.route("/me").get(getUser);
 router.route("/change-email").post(changeEmail);
 router.route("/change-password").post(changePassword);
+router.route("/change-username").put(changeUsername);
+
+
 
 export { router as userRoutes };

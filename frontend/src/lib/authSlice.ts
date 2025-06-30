@@ -73,6 +73,13 @@ const authSlice = createSlice({
       saveAuthToLocalStorage(token, { id, username, email, userimage });
     },
 
+    updateUsername:(state,action) => {
+      console.log("data coming from user api",action.payload);
+       if (state.user) {
+         state.user.username = action.payload;
+       }
+    }
+
     // setUserDetails: (state, action) => {
     //   const { id, username, email } = action.payload;
     //   state.user = { id, username, email,  };
@@ -81,5 +88,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { loginSuccess, Logout, googleLoginSuccess } = authSlice.actions;
+export const { loginSuccess, Logout, googleLoginSuccess , updateUsername } = authSlice.actions;
 export default authSlice.reducer;

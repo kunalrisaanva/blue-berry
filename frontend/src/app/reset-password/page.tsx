@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Button from "../components/ui/Button";
@@ -7,14 +7,33 @@ import { toast } from "sonner";
 import axios from "axios";
 import Loader from "../components/Loder";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useSelector } from "react-redux"; 
+
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  const [checkingAuth,setCheckingAuth] = useState(true)
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+
+
+
+const router = useRouter();
+  const isLoggedIn = useSelector((state: any) => state.auth.isAuthenticated);
+
+//   useEffect(() => {
+//      setIsLoading(true);
+//     if (!isLoggedIn) {
+//         setIsLoading(false);
+//       router.replace("/login");
+//     } else {
+//       setCheckingAuth(false);
+//        setIsLoading(false);
+//     //   fetchOrders();
+//     }
+//   }, [isLoggedIn]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

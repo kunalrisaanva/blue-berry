@@ -1,8 +1,10 @@
 "use client";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import { toast } from "sonner";
 import axios from "axios";
+import { updateUsername } from "@/lib/authSlice";
+
 
 interface ProfileProps {
   onClose: () => void;
@@ -13,6 +15,9 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
   const [showResetForm, setShowResetForm] = useState(false);
   const [currentPassword, setcurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const dispatch = useDispatch();
+
+
 
   const user = useSelector((state: any) => state.auth.user);
 
@@ -66,7 +71,7 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
       const token = localStorage.getItem("authToken");
 
       const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/update-username`,
+        `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/users/change-username`,
         { username },
         {
           headers: {
@@ -76,8 +81,15 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
         }
       );
 
+      
+      // console.log("response --->",res.data.data.username);
+      dispatch(updateUsername(res.data?.data.username))
+
+
       if (res.status === 200) {
         toast.success("Username updated successfully!");
+
+
         setShowUsernameForm(false);
       } else {
         toast.error("Failed to update username");
@@ -293,7 +305,8 @@ const Profile: React.FC<ProfileProps> = ({ onClose }) => {
                     className="w-5 h-5"
                     alt="Google"
                   />
-                  <span>Google • kunalrisaanva12@gmail.com</span>
+                  <span>Google • {user.email
+                    }</span>
                 </div>
               </div>
             </>

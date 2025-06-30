@@ -399,8 +399,9 @@ const changePassword = asyncHandler(
       return next(new ApiError(404, "User not found"));
     }
     const userData = user.rows[0];
+
     // Check if current password is correct
-    const isCurrentPasswordValid = comparePassword(
+    const isCurrentPasswordValid = await comparePassword(
       currentPassword,
       userData.password
     );
@@ -548,6 +549,34 @@ const getUser = asyncHandler(
   }
 );
 
+// In your user.controller.ts
+const changeUsername = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { username } = req.body;
+    const userId = req.user?.id;
+    if (!username) return next(new ApiError(400, "Username is required"));
+
+    const result = await db.query(
+      "UPDATE users SET username = $1 WHERE id = $2 RETURNING username",
+      [username, userId]
+    );
+
+    if (result.rowCount === 0) {
+      return next(new ApiError(404, "User not found"));
+    }
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { username: result.rows[0].username },
+          "Username updated"
+        )
+      );
+  }
+);
+
 export {
   registerUser,
   loginUser,
@@ -557,4 +586,5 @@ export {
   changePassword,
   resetPasswordMail,
   resetPassword,
+  changeUsername,
 };
