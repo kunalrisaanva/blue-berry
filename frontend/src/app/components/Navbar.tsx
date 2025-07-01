@@ -15,7 +15,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import Loader from "../components/Loder";
 import Button from "./ui/Button";
-// import { RootState } from "@/lib/store"; // Optional for proper Redux typing
+
 
 const Navbar = () => {
   const dispatch = useDispatch();
