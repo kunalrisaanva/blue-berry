@@ -85,7 +85,7 @@ function Main() {
     return <div className="text-red-500 text-center">Error: {error}</div>;
 
   return (
-    <div className="w-full mt-24 md:mt-2 p-2">
+    <div className="w-full mt-30 md:mt-2 p-2">
       <Slider />
 
       <div className="my-6">

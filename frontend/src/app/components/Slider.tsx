@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { IoMdArrowRoundBack } from "react-icons/io";
-import { IoMdArrowRoundForward } from "react-icons/io";
+import React, { useState, useEffect } from "react";
+import { IoMdArrowRoundBack, IoMdArrowRoundForward } from "react-icons/io";
 
 const slides = [
   {
@@ -48,8 +47,18 @@ const Slider: React.FC = () => {
     setCurrentIndex((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
   };
 
+  // Auto slide every 1 second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      nextSlide();
+    }, 5000);
+
+    // Clear interval on unmount
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="relative w-full  overflow-hidden rounded-lg shadow-lg bg-white border-2 border-gray-200">
+    <div className="relative w-full overflow-hidden rounded-lg shadow-lg bg-white border-2 border-gray-200">
       {/* Slides */}
       <div
         className="flex transition-transform duration-500"
@@ -61,11 +70,11 @@ const Slider: React.FC = () => {
             className="min-w-full flex flex-col md:flex-row items-center justify-between"
           >
             {/* Text Content */}
-            <div className="md:w-1/2   p-4 md:px-20  flex flex-col justify-self-auto items-start gap-4 ">
+            <div className="md:w-1/2 p-4 md:px-20 flex flex-col justify-self-auto items-start gap-4">
               <span className="text-xs font-semibold text-blue-500 bg-gray-100 px-2 py-1 rounded">
                 {slide.subtitle}
               </span>
-              <h2 className=" text-2xl md:text-4xl  pt-4 font-bold text-gray-900">
+              <h2 className="text-2xl md:text-4xl pt-4 font-bold text-gray-900">
                 {slide.title}
               </h2>
               <p className="text-gray-600 text-xl">{slide.description}</p>
@@ -73,7 +82,7 @@ const Slider: React.FC = () => {
                 Use code: <span className="font-bold">{slide.code}</span> for{" "}
                 <span className="font-bold">{slide.discount}</span> OFF
               </p>
-              <button className="bg-black text-white px-5 py-2 rounded hover:bg-gray-800 transition">
+              <button className="bg-black text-white px-5 py-2 rounded hover:bg-gray-800 transition cursor-pointer">
                 Shop Now
               </button>
             </div>

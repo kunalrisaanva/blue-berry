@@ -67,6 +67,7 @@ const router = useRouter();
       setIsLoading(false);
     }
   };
+  
 
   if (isLoading) return <Loader />;
 

@@ -1,5 +1,7 @@
 "use client";
+
 import React, { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import Badge from "@mui/material/Badge";
 import { PiShoppingCartSimpleDuotone, PiUserDuotone } from "react-icons/pi";
 import Link from "next/link";
@@ -9,22 +11,24 @@ import { Logout } from "@/lib/authSlice";
 import SearchBar from "./ui/SearchBar";
 import Profile from "@/app/components/Profile";
 import { FaSignInAlt } from "react-icons/fa";
+import axios from "axios";
+import { toast } from "sonner";
+import Loader from "../components/Loder";
+import Button from "./ui/Button";
+// import { RootState } from "@/lib/store"; // Optional for proper Redux typing
 
 const Navbar = () => {
-  const [hasMounted, setHasMounted] = useState(false);
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
   const dispatch = useDispatch();
+  const router = useRouter();
+  const dropdownRef = useRef(null);
+
   const cartItems = useSelector((state: any) => state.cart.items);
   const isLoggedIn = useSelector((state: any) => state.auth.isAuthenticated);
-  const router = useRouter();
 
   const [cartItemCount, setCartItemCount] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const dropdownRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setCartItemCount(cartItems.length);
@@ -45,12 +49,35 @@ const Navbar = () => {
 
   const handleLogin = () => router.push("/login");
 
-  const handleLogout = () => {
-    dispatch(Logout());
-    setShowDropdown(false);
+  const handleLogout = async () => {
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+
+    setIsLoading(true);
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/auth/logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      localStorage.removeItem("authToken");
+      dispatch(Logout());
+      toast.success("Logged out successfully");
+    } catch (e: any) {
+      toast.error(e?.response?.data?.message || "Logout failed");
+    } finally {
+      setIsLoading(false);
+      setShowDropdown(false);
+    }
   };
 
-  if (!hasMounted) return null;
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <>
@@ -59,10 +86,12 @@ const Navbar = () => {
           {/* Logo */}
           <div className="w-auto">
             <Link href="/">
-              <img
+              <Image
                 src="https://berry.reactbd.com/_next/static/media/logo.8fe5d04c.png"
                 alt="Logo"
-                className="h-8"
+                width={120}
+                height={40}
+                className="h-8 w-auto object-contain"
               />
             </Link>
           </div>
@@ -115,16 +144,16 @@ const Navbar = () => {
                           href="/orders"
                           className="block px-4 py-2 hover:bg-gray-100"
                         >
-                          orders
+                          Orders
                         </Link>
                       </li>
                       <li>
-                        <button
+                        <Button
                           onClick={handleLogout}
                           className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                         >
                           Sign out
-                        </button>
+                        </Button>
                       </li>
                     </ul>
                   </div>

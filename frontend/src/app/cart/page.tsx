@@ -11,7 +11,6 @@ import {
   removeFromCart,
 } from "../../lib/cartSlice";
 import Button from "../components/ui/Button";
-import { imageOptimizer } from "next/dist/server/image-optimizer";
 import axios from "axios";
 import { useEffect } from "react";
 
@@ -25,7 +24,7 @@ const Page = () => {
     (t: number, i: any) => t + i.price * i.quantity,
     0
   );
-  const discount = 2.8;
+  const discount = 7.65;
   const totalAmount = subTotal - discount;
 
   useEffect(() => {
@@ -52,7 +51,6 @@ const Page = () => {
     }
 
     try {
-      // 1. Call backend to create Razorpay order
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_API_URL}create-order`,
         {
@@ -69,26 +67,15 @@ const Page = () => {
         description: "Cart Checkout",
         order_id: data.data.orderId,
         handler: async function (response: any) {
-          // console.log("Full Razorpay response:", response);
+          const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+            response;
 
-          const razorpay_order_id =
-            response.razorpay_order_id || response.razorpayOrderId;
-          const razorpay_payment_id =
-            response.razorpay_payment_id || response.razorpayPaymentId;
-          const razorpay_signature =
-            response.razorpay_signature || response.razorpaySignature;
-
-          if (
-            !razorpay_order_id ||
-            !razorpay_payment_id ||
-            !razorpay_signature
-          ) {
+          if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
             toast.error("Payment response missing required fields!");
             return;
           }
 
           try {
-            // 3. Verify payment on backend
             const verifyRes = await axios.post(
               `${process.env.NEXT_PUBLIC_BASE_API_URL}verify`,
               {
@@ -105,7 +92,7 @@ const Page = () => {
               toast.error("Payment verification failed!");
             }
           } catch (error) {
-            console.error("Verification API error:", error);
+            console.error("Verification error:", error);
             toast.error("Payment verification failed!");
           }
         },
@@ -114,137 +101,141 @@ const Page = () => {
         },
       };
 
-      // 4. Open Razorpay checkout popup
       const razorpay = new (window as any).Razorpay(options);
       razorpay.open();
     } catch (err) {
-      console.error("Checkout Error:", err);
+      console.error("Checkout error:", err);
       toast.error("Checkout failed!");
     }
   };
 
   return (
-    <div className="w-full  pt-20 md:pt-2 px-4 sm:px-6 lg:px-8 ">
+    <div className="w-full max-w-screen-xl mx-auto px-4 pt-30 md:pt-4 pb-12">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-2">
+        🛍️ Shopping Cart
+      </h1>
+
       {isCartEmpty ? (
-        /* ---- EMPTY CART ---- */
-        <div className="text-center py-20">
-          <div>
-            <img
-              src="/emptyCart.png"
-              alt="Empty Cart"
-              className="mx-auto mb-4 w-40 sm:w-60"
-            />
-          </div>
-          <h2 className="text-xl sm:text-2xl font-semibold">
-            Your cart is empty!
-          </h2>
-          <Link
-            href="/"
-            className="mt-6 inline-block bg-black text-white px-6 py-3 rounded-md"
-          >
-            Start Shopping
-          </Link>
-        </div>
+        // <div className="text-center py-24">
+        //   <img
+        //     src="/emptyCart.png"
+        //     alt="Empty Cart"
+        //     className="mx-auto mb-6 w-44 sm:w-60"
+        //   />
+        //   <h2 className="text-2xl font-semibold mb-4">Your cart is empty</h2>
+        //   <Link
+        //     href="/"
+        //     className="inline-block bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition"
+        //   >
+        //     Start Shopping
+        //   </Link>
+        // </div>
+        <div className="text-center py-24">
+  <h2 className="text-3xl font-semibold mb-2">🛒 Oops! Your cart is empty</h2>
+  <p className="text-gray-600 mb-6 text-base">
+    Looks like you haven’t added anything yet. Let’s fix that! 💙
+  </p>
+  <Link
+    href="/"
+    className="inline-block bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition"
+  >
+    🛍️ Start Shopping
+  </Link>
+</div>
+
       ) : (
-        /* ---- CART FILLED ---- */
-        <div className="flex flex-col-reverse  lg:flex-row w-full gap-6  py-6">
-          {/* ====== Order Summary ====== */}
-          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm w-full lg:w-1/3">
-            <h2 className="text-lg sm:text-2xl font-semibold mb-6">
-              Order Summary
-            </h2>
-            <div className="flex justify-between mb-3 text-gray-700 text-sm sm:text-lg">
-              <span>SubTotal</span>
-              <span>${subTotal.toFixed(2)}</span>
+        <div className="flex flex-col-reverse lg:flex-row gap-6">
+          {/* Order Summary */}
+          <div className="w-full lg:w-1/3 bg-white rounded-xl border shadow-sm p-6">
+            <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+            <div className="text-sm sm:text-base text-gray-700 space-y-2">
+              <div className="flex justify-between">
+                <span>SubTotal</span>
+                <span>₹{subTotal}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Discount</span>
+                <span>₹{discount}</span>
+              </div>
+              <hr className="my-3" />
+              <div className="flex justify-between font-bold text-lg">
+                <span>Total</span>
+                <span>₹{totalAmount}</span>
+              </div>
             </div>
-            <div className="flex justify-between mb-3 text-gray-700 text-sm sm:text-lg">
-              <span>Discount</span>
-              <span>${discount.toFixed(2)}</span>
-            </div>
-            <hr className="my-4" />
-            <div className="flex justify-between text-base sm:text-xl font-bold">
-              <span>Total</span>
-              <span>${totalAmount.toFixed(2)}</span>
-            </div>
+
             <Button
-              className="flex items-center justify-center w-full text-xs text-center bg-black text-white p-3 rounded-md mt-4 cursor-pointer"
               onClick={handleProceedToCheckout}
+              className="mt-6 w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 transition cursor-pointer"
             >
               Proceed to Checkout
             </Button>
-            <Link href="/">
-              <p className="text-center text-gray-600 mt-4 hover:underline">
-                Continue Shopping
-              </p>
+            <Link href="/" className="block text-center text-sm mt-4 text-gray-500 hover:underline">
+              Continue Shopping
             </Link>
           </div>
 
-          {/* ====== Cart Table ====== */}
-          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm w-full lg:w-2/3">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">Product</h2>
-
-            {/* headings */}
-            <div className="hidden sm:grid grid-cols-4 font-semibold text-gray-700 mb-4">
+          {/* Cart Items */}
+          <div className="w-full lg:w-2/3 bg-white rounded-xl border shadow-sm p-6">
+            <div className="hidden sm:grid grid-cols-4 font-semibold text-gray-600 border-b pb-2 mb-4">
               <span>Product</span>
               <span className="text-center">Price</span>
               <span className="text-center">Quantity</span>
               <span className="text-right">Total</span>
             </div>
 
-            {/* items */}
             {cartItems.map((item: any) => (
               <div
                 key={item.id}
-                className="grid grid-cols-1 sm:grid-cols-4 items-center border-t py-4 gap-4 sm:gap-0"
+                className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4 border-t py-4"
               >
-                {/* product */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 sm:col-span-1">
                   <RiDeleteBin6Line
-                    size={20}
-                    className="cursor-pointer text-gray-600 hover:text-red-800"
+                    className="text-gray-500 hover:text-red-600 cursor-pointer"
+                    size={18}
                     onClick={() => handleRemoveFromCart(item.id, item.title)}
                   />
                   <img
                     src={item.image}
                     alt={item.title}
-                    className="w-16 h-16 rounded object-cover"
+                    className="w-14 h-14 rounded-md object-cover"
                   />
-                  <span className="text-sm sm:text-base">{item.title}</span>
+                  <span className="text-sm font-medium">{item.title}</span>
                 </div>
 
-                {/* price */}
-                <div className="text-center text-gray-700 font-medium sm:block hidden">
-                  ${item.price}
+                <div className="text-center sm:col-span-1 text-gray-700 hidden sm:block">
+                  ₹{item.price}
                 </div>
 
-                {/* quantity */}
-                <div className="flex justify-center items-center gap-2">
+                <div className="flex justify-center items-center gap-2 sm:col-span-1">
                   <button
-                    className="border rounded px-2 py-1"
+                    className="px-2 py-1 border rounded"
                     onClick={() => dispatch(decreaseQuantity(item.id))}
                   >
                     –
                   </button>
-                  <span>{item.quantity}</span>
+                  <span className="w-6 text-center">{item.quantity}</span>
                   <button
-                    className="border rounded px-2 py-1"
+                    className="px-2 py-1 border rounded"
                     onClick={() => dispatch(increaseQuantity(item.id))}
                   >
                     +
                   </button>
                 </div>
 
-                {/* total */}
-                <div className="text-right text-gray-700 font-medium sm:block hidden">
-                  ${item.price * item.quantity}
+                <div className="text-right text-gray-700 font-medium sm:col-span-1 hidden sm:block">
+                  ₹{(item.price * item.quantity)}
+                </div>
+
+                <div className="block sm:hidden text-center text-sm text-gray-500">
+                  Total: ₹{(item.price * item.quantity)}
                 </div>
               </div>
             ))}
 
-            {/* reset cart */}
             <div className="mt-6">
               <button
-                className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md w-full sm:w-auto"
+                className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md w-full sm:w-autoc cursor-pointer"
                 onClick={handleResetCart}
               >
                 Reset Cart

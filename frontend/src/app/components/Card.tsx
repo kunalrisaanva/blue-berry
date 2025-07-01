@@ -90,10 +90,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
         <div className="flex justify-between items-center text-sm font-medium">
           <div>
-            <span className="text-gray-900 text-base">${price}</span>
+            <span className="text-gray-900 text-base">₹{price}</span>
             {originalPrice && (
               <span className="line-through text-gray-400 ml-2">
-                ${originalPrice}
+                ₹{originalPrice}
               </span>
             )}
           </div>
@@ -101,7 +101,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         <button
-          className="w-full mt-2 bg-indigo-50 hover:bg-indigo-100 text-black border border-indigo-200 rounded-xl py-2 font-medium"
+          className="w-full mt-2 bg-indigo-50 hover:bg-indigo-100 text-black border border-indigo-200 rounded-xl py-2 font-medium cursor-pointer"
           onClick={handleAddToCart}
         >
           Add to cart

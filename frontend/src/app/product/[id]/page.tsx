@@ -11,6 +11,7 @@ import { TbTruckDelivery } from "react-icons/tb";
 import { TbBasketQuestion } from "react-icons/tb";
 import { FcShare } from "react-icons/fc";
 import { FaCodeCompare } from "react-icons/fa6";
+import Image from "next/image";
 
 const ProductPage: React.FC = () => {
   const { id } = useParams(); // Extract the product ID from the URL
@@ -24,7 +25,7 @@ const ProductPage: React.FC = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://blue-berry.onrender.com/api/v1/products/product`,
+          `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/products/product`,
           {
             params: { id }, // Pass the product ID as a query parameter
           }
@@ -72,10 +73,12 @@ const ProductPage: React.FC = () => {
         {/* Product Image */}
         <div className="md:w-1/2 flex justify-center items-center mb-6 md:mb-0">
           <div className="overflow-hidden rounded-xl">
-            <img
+            <Image
               src={product.imageurl}
               alt={product.name}
-              className="rounded-xl w-full transition-transform duration-300 ease-in-out hover:scale-110"
+              height={490}
+              width={490}
+              className="rounded-xl  transition-transform duration-300 ease-in-out hover:scale-110"
             />
           </div>
         </div>
@@ -94,10 +97,10 @@ const ProductPage: React.FC = () => {
 
           {/* Price */}
           <div className="flex items-center gap-3 text-lg font-semibold">
-            <span className="text-gray-900">${product.price}</span>
+            <span className="text-gray-900">₹{product.price}</span>
             {product.previousPrice && (
               <span className="line-through text-gray-400">
-                ${product.previousPrice}
+                ₹{product.previousPrice}
               </span>
             )}
             <span className="ml-auto text-sm text-gray-500">

@@ -28,10 +28,13 @@ router.get(
 );
 
 // Logout
-router.get("/logout", (req, res) => {
-  req.logout(() => {
-    res.redirect("/");
+router.post("/logout", (req, res) => {
+   req.logout(() => {
+    res.send("logout successully")
+    // res.redirect("/");
   });
 });
+
+
 
 export default router;

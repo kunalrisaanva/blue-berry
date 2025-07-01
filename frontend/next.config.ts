@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
-    domains: ['berry.reactbd.com'],
+    domains: ['berry.reactbd.com',"res.cloudinary.com"],
   },
 };
 
