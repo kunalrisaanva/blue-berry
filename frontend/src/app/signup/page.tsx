@@ -121,7 +121,7 @@ const Signup = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:1111/api/v1/auth/google";
+    window.location.href = `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/auth/google`;
   };
 
   return (
