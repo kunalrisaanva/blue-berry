@@ -14,16 +14,16 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     session: false,
-    failureRedirect: "http://localhost:3000/login",
+    failureRedirect: `${process.env.CLIENT_URL}login`,
   }),
   (req, res) => {
     const user: any = req.user;
 
     if (!user || !user.token) {
-      return res.redirect("http://localhost:3000/login?error=NoUser");
+      return res.redirect(`${process.env.CLIENT_URL}login?error=NoUser`);
     }
 
-    res.redirect(`http://localhost:3000/?token=${user.token}`);
+    res.redirect(`${process.env.CLIENT_URL}?token=${user.token}`);
   }
 );
 
